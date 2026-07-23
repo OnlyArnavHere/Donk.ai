@@ -1,0 +1,3 @@
+import { File } from '../models/File.js'; import { asyncHandler } from '../utils/asyncHandler.js'; import { send } from '../utils/response.js'; import { getProject } from '../services/project.service.js';
+export const uploadFile=asyncHandler(async(req,res)=>{await getProject(req.body.project,req.user,true);const file=await File.create({project:req.body.project,uploadedBy:req.user._id,originalName:req.file.originalname,path:req.file.path,mimeType:req.file.mimetype,size:req.file.size});send(res,{status:201,data:file});});
+export const list=asyncHandler(async(req,res)=>{await getProject(req.params.projectId,req.user);send(res,{data:await File.find({project:req.params.projectId})});});

@@ -1,0 +1,864 @@
+{
+  "architecture_model": {
+    "processing_unit": "Wireless MCU",
+    "communication_modules": [
+      "Cellular"
+    ],
+    "sensing_modules": [
+      "Temperature sensor",
+      "Humidity sensor",
+      "Wind speed sensor",
+      "Air pressure sensor",
+      "Pressure Sensor"
+    ],
+    "user_interface_modules": [
+      "Status Indicator",
+      "Mobile notifications"
+    ],
+    "power_subsystem": [
+      "Battery",
+      "Power Management"
+    ],
+    "storage_modules": [],
+    "interfaces": [
+      "GPIO",
+      "I2C",
+      "Power",
+      "UART"
+    ]
+  },
+  "architecture_graph": {
+    "nodes": [
+      {
+        "id": "wireless-mcu",
+        "type": "architecture",
+        "data": {
+          "label": "Wireless MCU",
+          "category": "Processing",
+          "inferred": true,
+          "sourceRequirements": [
+            "Cellular"
+          ]
+        }
+      },
+      {
+        "id": "battery",
+        "type": "architecture",
+        "data": {
+          "label": "Battery",
+          "category": "Power",
+          "inferred": true,
+          "sourceRequirements": [
+            "Solar-powered"
+          ]
+        }
+      },
+      {
+        "id": "power-management",
+        "type": "architecture",
+        "data": {
+          "label": "Power Management",
+          "category": "Power",
+          "inferred": true,
+          "sourceRequirements": [
+            "Solar-powered"
+          ]
+        }
+      },
+      {
+        "id": "temperature-sensor",
+        "type": "architecture",
+        "data": {
+          "label": "Temperature sensor",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Temperature sensor"
+          ]
+        }
+      },
+      {
+        "id": "humidity-sensor",
+        "type": "architecture",
+        "data": {
+          "label": "Humidity sensor",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Humidity sensor"
+          ]
+        }
+      },
+      {
+        "id": "wind-speed-sensor",
+        "type": "architecture",
+        "data": {
+          "label": "Wind speed sensor",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Wind speed sensor"
+          ]
+        }
+      },
+      {
+        "id": "air-pressure-sensor",
+        "type": "architecture",
+        "data": {
+          "label": "Air pressure sensor",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Air pressure sensor"
+          ]
+        }
+      },
+      {
+        "id": "pressure-sensor",
+        "type": "architecture",
+        "data": {
+          "label": "Pressure Sensor",
+          "category": "Sensor",
+          "inferred": false,
+          "sourceRequirements": [
+            "Air pressure sensor"
+          ]
+        }
+      },
+      {
+        "id": "status-indicator",
+        "type": "architecture",
+        "data": {
+          "label": "Status Indicator",
+          "category": "Output",
+          "inferred": false,
+          "sourceRequirements": [
+            "LED indicators"
+          ]
+        }
+      },
+      {
+        "id": "mobile-notifications",
+        "type": "architecture",
+        "data": {
+          "label": "Mobile notifications",
+          "category": "Output",
+          "inferred": false,
+          "sourceRequirements": [
+            "Mobile notifications"
+          ]
+        }
+      },
+      {
+        "id": "cellular",
+        "type": "architecture",
+        "data": {
+          "label": "Cellular",
+          "category": "Communication",
+          "inferred": false,
+          "sourceRequirements": [
+            "Cellular"
+          ]
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "battery-power-power-management",
+        "source": "battery",
+        "target": "power-management",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-wireless-mcu",
+        "source": "power-management",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-uart-cellular",
+        "source": "wireless-mcu",
+        "target": "cellular",
+        "type": "smoothstep",
+        "label": "UART",
+        "data": {
+          "interface": "UART",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "temperature-sensor-i2c-wireless-mcu",
+        "source": "temperature-sensor",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "humidity-sensor-i2c-wireless-mcu",
+        "source": "humidity-sensor",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wind-speed-sensor-i2c-wireless-mcu",
+        "source": "wind-speed-sensor",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "air-pressure-sensor-i2c-wireless-mcu",
+        "source": "air-pressure-sensor",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "pressure-sensor-i2c-wireless-mcu",
+        "source": "pressure-sensor",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-gpio-status-indicator",
+        "source": "wireless-mcu",
+        "target": "status-indicator",
+        "type": "smoothstep",
+        "label": "GPIO",
+        "data": {
+          "interface": "GPIO",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-gpio-mobile-notifications",
+        "source": "wireless-mcu",
+        "target": "mobile-notifications",
+        "type": "smoothstep",
+        "label": "GPIO",
+        "data": {
+          "interface": "GPIO",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-temperature-sensor",
+        "source": "power-management",
+        "target": "temperature-sensor",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-humidity-sensor",
+        "source": "power-management",
+        "target": "humidity-sensor",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-wind-speed-sensor",
+        "source": "power-management",
+        "target": "wind-speed-sensor",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-air-pressure-sensor",
+        "source": "power-management",
+        "target": "air-pressure-sensor",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-pressure-sensor",
+        "source": "power-management",
+        "target": "pressure-sensor",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-status-indicator",
+        "source": "power-management",
+        "target": "status-indicator",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-mobile-notifications",
+        "source": "power-management",
+        "target": "mobile-notifications",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-cellular",
+        "source": "power-management",
+        "target": "cellular",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      }
+    ]
+  },
+  "architecture_notes": [
+    "Wireless MCU acts as the central processing unit.",
+    "The graph represents logical subsystem relationships; exact components are intentionally deferred."
+  ],
+  "assumptions": [
+    "Wireless MCU is an inferred, technology-level subsystem from: Cellular; exact components remain unspecified.",
+    "Battery is an inferred, technology-level subsystem from: Solar-powered; exact components remain unspecified.",
+    "Power Management is an inferred, technology-level subsystem from: Solar-powered; exact components remain unspecified."
+  ],
+  "warnings": [],
+  "react_flow": {
+    "nodes": [
+      {
+        "id": "wireless-mcu",
+        "type": "architecture",
+        "data": {
+          "label": "Wireless MCU",
+          "category": "Processing",
+          "inferred": true,
+          "sourceRequirements": [
+            "Cellular"
+          ]
+        },
+        "position": {
+          "x": 640,
+          "y": 0
+        }
+      },
+      {
+        "id": "battery",
+        "type": "architecture",
+        "data": {
+          "label": "Battery",
+          "category": "Power",
+          "inferred": true,
+          "sourceRequirements": [
+            "Solar-powered"
+          ]
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "power-management",
+        "type": "architecture",
+        "data": {
+          "label": "Power Management",
+          "category": "Power",
+          "inferred": true,
+          "sourceRequirements": [
+            "Solar-powered"
+          ]
+        },
+        "position": {
+          "x": 0,
+          "y": 160
+        }
+      },
+      {
+        "id": "temperature-sensor",
+        "type": "architecture",
+        "data": {
+          "label": "Temperature sensor",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Temperature sensor"
+          ]
+        },
+        "position": {
+          "x": 320,
+          "y": 0
+        }
+      },
+      {
+        "id": "humidity-sensor",
+        "type": "architecture",
+        "data": {
+          "label": "Humidity sensor",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Humidity sensor"
+          ]
+        },
+        "position": {
+          "x": 320,
+          "y": 160
+        }
+      },
+      {
+        "id": "wind-speed-sensor",
+        "type": "architecture",
+        "data": {
+          "label": "Wind speed sensor",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Wind speed sensor"
+          ]
+        },
+        "position": {
+          "x": 320,
+          "y": 320
+        }
+      },
+      {
+        "id": "air-pressure-sensor",
+        "type": "architecture",
+        "data": {
+          "label": "Air pressure sensor",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Air pressure sensor"
+          ]
+        },
+        "position": {
+          "x": 320,
+          "y": 480
+        }
+      },
+      {
+        "id": "pressure-sensor",
+        "type": "architecture",
+        "data": {
+          "label": "Pressure Sensor",
+          "category": "Sensor",
+          "inferred": false,
+          "sourceRequirements": [
+            "Air pressure sensor"
+          ]
+        },
+        "position": {
+          "x": 320,
+          "y": 640
+        }
+      },
+      {
+        "id": "status-indicator",
+        "type": "architecture",
+        "data": {
+          "label": "Status Indicator",
+          "category": "Output",
+          "inferred": false,
+          "sourceRequirements": [
+            "LED indicators"
+          ]
+        },
+        "position": {
+          "x": 1280,
+          "y": 0
+        }
+      },
+      {
+        "id": "mobile-notifications",
+        "type": "architecture",
+        "data": {
+          "label": "Mobile notifications",
+          "category": "Output",
+          "inferred": false,
+          "sourceRequirements": [
+            "Mobile notifications"
+          ]
+        },
+        "position": {
+          "x": 1280,
+          "y": 160
+        }
+      },
+      {
+        "id": "cellular",
+        "type": "architecture",
+        "data": {
+          "label": "Cellular",
+          "category": "Communication",
+          "inferred": false,
+          "sourceRequirements": [
+            "Cellular"
+          ]
+        },
+        "position": {
+          "x": 960,
+          "y": 0
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "battery-power-power-management",
+        "source": "battery",
+        "target": "power-management",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-wireless-mcu",
+        "source": "power-management",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-uart-cellular",
+        "source": "wireless-mcu",
+        "target": "cellular",
+        "type": "smoothstep",
+        "label": "UART",
+        "data": {
+          "interface": "UART",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "temperature-sensor-i2c-wireless-mcu",
+        "source": "temperature-sensor",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "humidity-sensor-i2c-wireless-mcu",
+        "source": "humidity-sensor",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wind-speed-sensor-i2c-wireless-mcu",
+        "source": "wind-speed-sensor",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "air-pressure-sensor-i2c-wireless-mcu",
+        "source": "air-pressure-sensor",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "pressure-sensor-i2c-wireless-mcu",
+        "source": "pressure-sensor",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-gpio-status-indicator",
+        "source": "wireless-mcu",
+        "target": "status-indicator",
+        "type": "smoothstep",
+        "label": "GPIO",
+        "data": {
+          "interface": "GPIO",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-gpio-mobile-notifications",
+        "source": "wireless-mcu",
+        "target": "mobile-notifications",
+        "type": "smoothstep",
+        "label": "GPIO",
+        "data": {
+          "interface": "GPIO",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-temperature-sensor",
+        "source": "power-management",
+        "target": "temperature-sensor",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-humidity-sensor",
+        "source": "power-management",
+        "target": "humidity-sensor",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-wind-speed-sensor",
+        "source": "power-management",
+        "target": "wind-speed-sensor",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-air-pressure-sensor",
+        "source": "power-management",
+        "target": "air-pressure-sensor",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-pressure-sensor",
+        "source": "power-management",
+        "target": "pressure-sensor",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-status-indicator",
+        "source": "power-management",
+        "target": "status-indicator",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-mobile-notifications",
+        "source": "power-management",
+        "target": "mobile-notifications",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-cellular",
+        "source": "power-management",
+        "target": "cellular",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      }
+    ]
+  }
+}

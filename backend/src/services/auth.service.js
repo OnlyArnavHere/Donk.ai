@@ -1,0 +1,10 @@
+import bcrypt from 'bcryptjs';
+import { User } from '../models/User.js';
+import { Session } from '../models/Session.js';
+import { ApiError } from '../utils/ApiError.js';
+import { hashToken, signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/tokens.js';
+export const register = async ({ name, email, password }) => { if (await User.findOne({ email })) throw ApiError.badRequest('Email is already registered'); const user = await User.create({ name, email, password: await bcrypt.hash(password, 12) }); return issue(user); };
+export const login = async ({ email, password }) => { const user = await User.findOne({ email }).select('+password'); if (!user || !(await bcrypt.compare(password, user.password))) throw ApiError.unauthorized('Invalid email or password'); return issue(user); };
+const issue = async (user) => { const session = await Session.create({ user: user._id, expiresAt: new Date(Date.now() + 30 * 86400000) }); const refreshToken = signRefreshToken(user, session._id); session.tokenHash = hashToken(refreshToken); await session.save(); return { user: user.toJSON(), accessToken: signAccessToken(user), refreshToken }; };
+export const refresh = async (token) => { let p; try { p = verifyRefreshToken(token); } catch { throw ApiError.unauthorized('Invalid refresh token'); } const s = await Session.findOne({ _id: p.sid, user: p.sub, tokenHash: hashToken(token), expiresAt: { $gt: new Date() } }); if (!s) throw ApiError.unauthorized('Refresh session expired'); await s.deleteOne(); return issue(await User.findById(p.sub)); };
+export const logout = async (token) => { if (token) await Session.deleteOne({ tokenHash: hashToken(token) }); };

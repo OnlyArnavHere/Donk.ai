@@ -1,0 +1,14 @@
+{
+  "overall_score": 5,
+  "relevance_score": 5,
+  "groundedness_score": 5,
+  "graph_quality_score": 5,
+  "verdict": "PASS",
+  "strengths": [
+    "Complete architecture",
+    "Relevant technology-level architecture",
+    "Vendor-neutral"
+  ],
+  "weaknesses": [],
+  "warnings": []
+}

@@ -1,0 +1,10 @@
+import { Project } from '../models/Project.js';
+import { ApiError } from '../utils/ApiError.js';
+const access = (p, user, write = false) => { const member = p.members.find(m => m.user.toString() === user._id.toString()); if (p.owner.toString() !== user._id.toString() && (!member || (write && member.role !== 'editor'))) throw ApiError.forbidden(); };
+export const getProject = async (id, user, write = false) => { const p = await Project.findById(id).populate('owner members.user'); if (!p) throw ApiError.notFound('Project not found'); access(p, user, write); return p; };
+export const listProjects = (user) => Project.find({ $or: [{ owner: user._id }, { 'members.user': user._id }] }).sort({ createdAt: -1 });
+export const createProject = (data, user) => Project.create({ ...data, owner: user._id });
+export const updateProject = async (id, data, user) => { await getProject(id, user, true); return Project.findByIdAndUpdate(id, data, { new: true, runValidators: true }); };
+export const deleteProject = async (id, user) => { const p = await Project.findOne({ _id: id, owner: user._id }); if (!p) throw ApiError.notFound('Project not found'); await p.deleteOne(); return p; };
+export const shareProject = async (id, email, role, user) => { const p = await getProject(id, user, true); const target = await (await import('../models/User.js')).User.findOne({ email }); if (!target) throw ApiError.notFound('User not found'); p.members = p.members.filter(m => m.user.toString() !== target._id.toString()); p.members.push({ user: target._id, role }); return p.save(); };
+export const duplicateProject = async (id, user) => { const p = await getProject(id, user); const copy = p.toObject(); delete copy._id; delete copy.createdAt; delete copy.updatedAt; copy.title = `${copy.title} (Copy)`; copy.owner = user._id; return Project.create(copy); };

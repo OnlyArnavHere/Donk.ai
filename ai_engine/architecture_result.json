@@ -1,0 +1,695 @@
+{
+  "architecture_model": {
+    "processing_unit": "Wireless MCU",
+    "communication_modules": [
+      "Bluetooth"
+    ],
+    "sensing_modules": [
+      "Capacitive Touch Controller",
+      "MEMS Microphone",
+      "GNSS Receiver"
+    ],
+    "user_interface_modules": [
+      "Display",
+      "Audio Output"
+    ],
+    "power_subsystem": [
+      "Battery",
+      "Power Management"
+    ],
+    "storage_modules": [],
+    "interfaces": [
+      "Audio",
+      "BLE",
+      "I2C",
+      "Power",
+      "SPI"
+    ]
+  },
+  "architecture_graph": {
+    "nodes": [
+      {
+        "id": "wireless-mcu",
+        "type": "architecture",
+        "data": {
+          "label": "Wireless MCU",
+          "category": "Processing",
+          "inferred": true,
+          "sourceRequirements": [
+            "Bluetooth"
+          ]
+        }
+      },
+      {
+        "id": "battery",
+        "type": "architecture",
+        "data": {
+          "label": "Battery",
+          "category": "Power",
+          "inferred": true,
+          "sourceRequirements": [
+            "Rechargeable Battery"
+          ]
+        }
+      },
+      {
+        "id": "power-management",
+        "type": "architecture",
+        "data": {
+          "label": "Power Management",
+          "category": "Power",
+          "inferred": true,
+          "sourceRequirements": [
+            "Rechargeable Battery"
+          ]
+        }
+      },
+      {
+        "id": "capacitive-touch-controller",
+        "type": "architecture",
+        "data": {
+          "label": "Capacitive Touch Controller",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Touch Input"
+          ]
+        }
+      },
+      {
+        "id": "mems-microphone",
+        "type": "architecture",
+        "data": {
+          "label": "MEMS Microphone",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Microphone"
+          ]
+        }
+      },
+      {
+        "id": "gnss-receiver",
+        "type": "architecture",
+        "data": {
+          "label": "GNSS Receiver",
+          "category": "Sensor",
+          "inferred": false,
+          "sourceRequirements": [
+            "Navigation"
+          ]
+        }
+      },
+      {
+        "id": "display",
+        "type": "architecture",
+        "data": {
+          "label": "Display",
+          "category": "Output",
+          "inferred": false,
+          "sourceRequirements": [
+            "Micro OLED Display"
+          ]
+        }
+      },
+      {
+        "id": "audio-output",
+        "type": "architecture",
+        "data": {
+          "label": "Audio Output",
+          "category": "Output",
+          "inferred": false,
+          "sourceRequirements": [
+            "Speaker"
+          ]
+        }
+      },
+      {
+        "id": "bluetooth",
+        "type": "architecture",
+        "data": {
+          "label": "Bluetooth",
+          "category": "Communication",
+          "inferred": false,
+          "sourceRequirements": [
+            "Bluetooth"
+          ]
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "battery-power-power-management",
+        "source": "battery",
+        "target": "power-management",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-wireless-mcu",
+        "source": "power-management",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-ble-bluetooth",
+        "source": "wireless-mcu",
+        "target": "bluetooth",
+        "type": "smoothstep",
+        "label": "BLE",
+        "data": {
+          "interface": "BLE",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "capacitive-touch-controller-i2c-wireless-mcu",
+        "source": "capacitive-touch-controller",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "mems-microphone-audio-wireless-mcu",
+        "source": "mems-microphone",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "Audio",
+        "data": {
+          "interface": "Audio",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "gnss-receiver-i2c-wireless-mcu",
+        "source": "gnss-receiver",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-spi-display",
+        "source": "wireless-mcu",
+        "target": "display",
+        "type": "smoothstep",
+        "label": "SPI",
+        "data": {
+          "interface": "SPI",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-audio-audio-output",
+        "source": "wireless-mcu",
+        "target": "audio-output",
+        "type": "smoothstep",
+        "label": "Audio",
+        "data": {
+          "interface": "Audio",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-capacitive-touch-controller",
+        "source": "power-management",
+        "target": "capacitive-touch-controller",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-mems-microphone",
+        "source": "power-management",
+        "target": "mems-microphone",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-gnss-receiver",
+        "source": "power-management",
+        "target": "gnss-receiver",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-display",
+        "source": "power-management",
+        "target": "display",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-audio-output",
+        "source": "power-management",
+        "target": "audio-output",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-bluetooth",
+        "source": "power-management",
+        "target": "bluetooth",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      }
+    ]
+  },
+  "architecture_notes": [
+    "Wireless MCU acts as the central processing unit.",
+    "The graph represents logical subsystem relationships; exact components are intentionally deferred."
+  ],
+  "assumptions": [
+    "Wireless MCU is an inferred, technology-level subsystem from: Bluetooth; exact components remain unspecified.",
+    "Battery is an inferred, technology-level subsystem from: Rechargeable Battery; exact components remain unspecified.",
+    "Power Management is an inferred, technology-level subsystem from: Rechargeable Battery; exact components remain unspecified."
+  ],
+  "warnings": [],
+  "react_flow": {
+    "nodes": [
+      {
+        "id": "wireless-mcu",
+        "type": "architecture",
+        "data": {
+          "label": "Wireless MCU",
+          "category": "Processing",
+          "inferred": true,
+          "sourceRequirements": [
+            "Bluetooth"
+          ]
+        },
+        "position": {
+          "x": 640,
+          "y": 0
+        }
+      },
+      {
+        "id": "battery",
+        "type": "architecture",
+        "data": {
+          "label": "Battery",
+          "category": "Power",
+          "inferred": true,
+          "sourceRequirements": [
+            "Rechargeable Battery"
+          ]
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "power-management",
+        "type": "architecture",
+        "data": {
+          "label": "Power Management",
+          "category": "Power",
+          "inferred": true,
+          "sourceRequirements": [
+            "Rechargeable Battery"
+          ]
+        },
+        "position": {
+          "x": 0,
+          "y": 160
+        }
+      },
+      {
+        "id": "capacitive-touch-controller",
+        "type": "architecture",
+        "data": {
+          "label": "Capacitive Touch Controller",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Touch Input"
+          ]
+        },
+        "position": {
+          "x": 320,
+          "y": 0
+        }
+      },
+      {
+        "id": "mems-microphone",
+        "type": "architecture",
+        "data": {
+          "label": "MEMS Microphone",
+          "category": "Input",
+          "inferred": false,
+          "sourceRequirements": [
+            "Microphone"
+          ]
+        },
+        "position": {
+          "x": 320,
+          "y": 160
+        }
+      },
+      {
+        "id": "gnss-receiver",
+        "type": "architecture",
+        "data": {
+          "label": "GNSS Receiver",
+          "category": "Sensor",
+          "inferred": false,
+          "sourceRequirements": [
+            "Navigation"
+          ]
+        },
+        "position": {
+          "x": 320,
+          "y": 320
+        }
+      },
+      {
+        "id": "display",
+        "type": "architecture",
+        "data": {
+          "label": "Display",
+          "category": "Output",
+          "inferred": false,
+          "sourceRequirements": [
+            "Micro OLED Display"
+          ]
+        },
+        "position": {
+          "x": 1280,
+          "y": 0
+        }
+      },
+      {
+        "id": "audio-output",
+        "type": "architecture",
+        "data": {
+          "label": "Audio Output",
+          "category": "Output",
+          "inferred": false,
+          "sourceRequirements": [
+            "Speaker"
+          ]
+        },
+        "position": {
+          "x": 1280,
+          "y": 160
+        }
+      },
+      {
+        "id": "bluetooth",
+        "type": "architecture",
+        "data": {
+          "label": "Bluetooth",
+          "category": "Communication",
+          "inferred": false,
+          "sourceRequirements": [
+            "Bluetooth"
+          ]
+        },
+        "position": {
+          "x": 960,
+          "y": 0
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "battery-power-power-management",
+        "source": "battery",
+        "target": "power-management",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-wireless-mcu",
+        "source": "power-management",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-ble-bluetooth",
+        "source": "wireless-mcu",
+        "target": "bluetooth",
+        "type": "smoothstep",
+        "label": "BLE",
+        "data": {
+          "interface": "BLE",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "capacitive-touch-controller-i2c-wireless-mcu",
+        "source": "capacitive-touch-controller",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "mems-microphone-audio-wireless-mcu",
+        "source": "mems-microphone",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "Audio",
+        "data": {
+          "interface": "Audio",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "gnss-receiver-i2c-wireless-mcu",
+        "source": "gnss-receiver",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "I2C",
+        "data": {
+          "interface": "I2C",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-spi-display",
+        "source": "wireless-mcu",
+        "target": "display",
+        "type": "smoothstep",
+        "label": "SPI",
+        "data": {
+          "interface": "SPI",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-audio-audio-output",
+        "source": "wireless-mcu",
+        "target": "audio-output",
+        "type": "smoothstep",
+        "label": "Audio",
+        "data": {
+          "interface": "Audio",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-capacitive-touch-controller",
+        "source": "power-management",
+        "target": "capacitive-touch-controller",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-mems-microphone",
+        "source": "power-management",
+        "target": "mems-microphone",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-gnss-receiver",
+        "source": "power-management",
+        "target": "gnss-receiver",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-display",
+        "source": "power-management",
+        "target": "display",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-audio-output",
+        "source": "power-management",
+        "target": "audio-output",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-bluetooth",
+        "source": "power-management",
+        "target": "bluetooth",
+        "type": "smoothstep",
+        "label": "Power",
+        "data": {
+          "interface": "Power",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      }
+    ]
+  }
+}
