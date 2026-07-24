@@ -1,42 +1,42 @@
 {
-  "project_name": "Smart Weather Monitoring System",
+  "project_name": "Smart Weather System",
   "category": "Environmental Monitoring",
-  "objective": "Monitor weather conditions",
+  "objective": "Comprehensive weather monitoring",
   "target_users": [
-    "Multi-user support with role-based access control and customizable dashboards"
+    "general public"
   ],
   "functional_requirements": [
-    "Real-time monitoring",
-    "Historical data analysis",
-    "Alerts for specific weather conditions"
+    "temperature monitoring",
+    "humidity monitoring",
+    "wind speed monitoring",
+    "air quality monitoring"
   ],
   "hardware_inputs": [
-    "Temperature sensor",
-    "Humidity sensor",
-    "Wind speed sensor",
-    "Air pressure sensor"
+    "temperature sensor",
+    "humidity sensor",
+    "wind speed sensor",
+    "air quality sensor"
   ],
   "hardware_outputs": [
-    "LED indicators",
-    "Mobile notifications"
+    "touchscreen display"
   ],
   "connectivity": [
-    "Cellular"
+    "Wi-Fi"
   ],
   "supported_platforms": [
-    "Embedded MCU"
+    "Android"
   ],
-  "power_requirements": "Solar-powered",
+  "power_requirements": "['medium power', 'daily charging']",
   "physical_constraints": [
-    "IP65 rating"
+    "durability",
+    "protection from extreme weather conditions"
   ],
   "performance_requirements": [
-    "Sampling rate",
-    "Data accuracy",
-    "Response time"
+    "medium power consumption",
+    "daily charging"
   ],
   "safety_compliance": [
-    "Lightning protection"
+    "industry-specific safety regulations"
   ],
-  "budget": "10000"
+  "budget": "500-1000"
 }
