@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
   { name: "Features", href: "#features" },
@@ -65,15 +66,16 @@ export function Navigation() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
+            <ThemeToggle />
             <a href="/workspace" className={`text-foreground/70 hover:text-foreground transition-all duration-500 ${isScrolled ? "text-xs" : "text-sm"}`}>
               Launch App
             </a>
-            <a href="/workspace">
+              <a href="/login">
               <Button
                 size="sm"
                 className={`bg-foreground hover:bg-foreground/90 text-background rounded-full transition-all duration-500 ${isScrolled ? "px-4 h-8 text-xs" : "px-6"}`}
               >
-                Try Workspace
+                Sign in
               </Button>
             </a>
           </div>

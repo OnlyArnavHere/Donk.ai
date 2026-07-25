@@ -145,7 +145,7 @@ export function BOMView({ projectId }: BOMViewProps) {
                       </span>
                     </TableCell>
                     <TableCell className="h-10 text-xs font-semibold text-foreground">{item.cost}</TableCell>
-                    <TableCell className="h-10 text-xs text-green-500">{item.availability}</TableCell>
+                    <TableCell className="h-10 text-xs text-accent">{item.availability}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

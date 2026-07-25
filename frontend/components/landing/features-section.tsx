@@ -243,8 +243,16 @@ function AnimatedVisual({ type }: { type: string }) {
   }
 }
 
+function StaticVisual({ type }: { type: string }) {
+  if (type === "deploy") return <svg viewBox="0 0 200 160" className="h-full w-full"><rect x="30" y="20" width="140" height="120" rx="4" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M42 40h45M42 56h60M42 72h78M42 88h96M42 104h108M42 120h114" stroke="currentColor" strokeWidth="10" strokeLinecap="round" opacity=".65"/><circle cx="100" cy="155" r="3" fill="currentColor" opacity=".45"/></svg>
+  if (type === "ai") return <svg viewBox="0 0 200 160" className="h-full w-full"><circle cx="100" cy="80" r="12" fill="currentColor"/>{[0,1,2,3,4,5].map((i) => { const angle = i * 60 * Math.PI / 180; const x = 100 + Math.cos(angle) * 50; const y = 80 + Math.sin(angle) * 50; return <g key={i}><line x1="100" y1="80" x2={x} y2={y} stroke="currentColor" strokeWidth="1" opacity=".45"/><circle cx={x} cy={y} r="6" fill="none" stroke="currentColor" strokeWidth="2"/></g>})}</svg>
+  if (type === "collab") return <svg viewBox="0 0 200 160" className="h-full w-full"><rect x="30" y="50" width="50" height="60" rx="4" fill="none" stroke="currentColor" strokeWidth="2"/><text x="55" y="85" textAnchor="middle" fontSize="20" fontFamily="monospace" fill="currentColor">A</text><circle cx="55" cy="35" r="12" fill="none" stroke="currentColor" strokeWidth="2"/><rect x="120" y="50" width="50" height="60" rx="4" fill="none" stroke="currentColor" strokeWidth="2"/><text x="145" y="85" textAnchor="middle" fontSize="20" fontFamily="monospace" fill="currentColor">B</text><circle cx="145" cy="35" r="12" fill="none" stroke="currentColor" strokeWidth="2"/><line x1="80" y1="80" x2="120" y2="80" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4"/><circle cx="100" cy="130" r="6" fill="none" stroke="currentColor" strokeWidth="2"/></svg>
+  return <svg viewBox="0 0 200 160" className="h-full w-full"><path d="M100 20l50 20v50q0 40-50 55Q50 130 50 90V40z" fill="none" stroke="currentColor" strokeWidth="2"/><rect x="85" y="70" width="30" height="25" rx="3" fill="currentColor"/><path d="M90 70V60q0-10 10-10t10 10v10" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/></svg>
+}
+
 function FeatureCard({ feature, index }: { feature: typeof features[0]; index: number }) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -262,6 +270,11 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
   return (
     <div
       ref={cardRef}
+      tabIndex={0}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsHovered(true)}
+      onBlur={() => setIsHovered(false)}
       className={`group relative transition-all duration-700 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
       }`}
@@ -286,8 +299,8 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
           
           {/* Visual */}
           <div className="flex justify-center lg:justify-end">
-            <div className="w-48 h-40 text-foreground">
-              <AnimatedVisual type={feature.visual} />
+            <div className="h-40 w-48 text-foreground transition-transform duration-300 group-hover:scale-105" aria-label={`${feature.title} visual`}>
+              {isHovered ? <AnimatedVisual type={feature.visual} /> : <StaticVisual type={feature.visual} />}
             </div>
           </div>
         </div>

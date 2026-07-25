@@ -68,7 +68,7 @@ export function RequirementsView({ projectId }: RequirementsViewProps) {
               <div key={req.id} className="bg-secondary rounded-lg border border-border p-4 hover:border-accent/50 transition-colors">
                 <div className="flex items-start gap-3">
                   {req.status === 'completed' && (
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
                   )}
                   {req.status === 'in-progress' && (
                     <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />

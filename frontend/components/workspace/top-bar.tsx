@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -40,6 +41,7 @@ export function TopBar({ activeProject }: TopBarProps) {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2 ml-auto">
+        <ThemeToggle />
         {/* Share */}
         <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90">
           <Share2 className="w-4 h-4" />

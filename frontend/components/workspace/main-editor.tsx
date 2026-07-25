@@ -12,6 +12,7 @@ import { ArchitectureView } from './views/architecture-view';
 import { BOMView } from './views/bom-view';
 import { ValidationView } from './views/validation-view';
 import { DocsView } from './views/docs-view';
+import { PcbView } from './views/pcb-view';
 
 interface MainEditorProps {
   activeProject: string;
@@ -27,6 +28,7 @@ export function MainEditor({ activeProject, activeTab, setActiveTab }: MainEdito
     bom: <BOMView projectId={activeProject} />,
     validation: <ValidationView projectId={activeProject} />,
     docs: <DocsView projectId={activeProject} />,
+    pcb: <PcbView />,
   };
 
   return (
@@ -47,6 +49,7 @@ export function MainEditor({ activeProject, activeTab, setActiveTab }: MainEdito
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
             )}
           </button>
+          <button onClick={() => setActiveTab('pcb')} className={`px-4 py-2 text-sm font-medium transition-all duration-300 whitespace-nowrap relative ${activeTab === 'pcb' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>PCB{activeTab === 'pcb' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-full" />}</button>
           <button
             onClick={() => setActiveTab('requirements')}
             className={`px-4 py-2 text-sm font-medium transition-all duration-300 whitespace-nowrap relative group active:scale-95 ${

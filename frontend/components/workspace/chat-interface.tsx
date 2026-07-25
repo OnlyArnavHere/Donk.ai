@@ -1,221 +1,55 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Paperclip, Zap, Loader } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useEffect, useState } from 'react'
+import { ArrowUp, Loader2, Mic, Paperclip, Sparkles } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
-interface ChatInterfaceProps {
-  projectId: string;
-}
+type Message = { id: string; role: 'user' | 'assistant'; content: string }
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  isLoading?: boolean;
-}
+const suggestions = ['Design a low-power sensor board', 'Review my power architecture', 'Create a KiCad starter project']
+const placeholderPrompts = [
+  'Design an IoT temperature sensor with WiFi...',
+  'Create a low-power wearable board...',
+  'Review my power architecture...',
+]
 
-export function ChatInterface({ projectId }: ChatInterfaceProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [displayedPlaceholder, setDisplayedPlaceholder] = useState('');
-  const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  
-  const placeholders = [
-    'Design an IoT temperature sensor with WiFi...',
-    'Create a power management system for wearables...',
-    'Build a wireless charging circuit...',
-    'Design a battery-powered tracking device...',
-  ];
+export function ChatInterface({ projectId }: { projectId: string }) {
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [placeholder, setPlaceholder] = useState('')
+  const [placeholderIndex, setPlaceholderIndex] = useState(0)
 
-  // Typewriter effect for placeholder
   useEffect(() => {
-    const currentPlaceholder = placeholders[placeholderIndex % placeholders.length];
-    const timer = setTimeout(() => {
-      if (displayedPlaceholder.length < currentPlaceholder.length) {
-        setDisplayedPlaceholder(currentPlaceholder.slice(0, displayedPlaceholder.length + 1));
-      } else {
-        setTimeout(() => {
-          setDisplayedPlaceholder('');
-          setPlaceholderIndex((i) => i + 1);
-        }, 2000);
-      }
-    }, 50);
+    if (input) return
+    const prompt = placeholderPrompts[placeholderIndex]
+    if (placeholder.length < prompt.length) {
+      const timer = window.setTimeout(() => setPlaceholder(prompt.slice(0, placeholder.length + 1)), 42)
+      return () => window.clearTimeout(timer)
+    }
+    const timer = window.setTimeout(() => {
+      setPlaceholder('')
+      setPlaceholderIndex((current) => (current + 1) % placeholderPrompts.length)
+    }, 1800)
+    return () => window.clearTimeout(timer)
+  }, [input, placeholder, placeholderIndex])
 
-    return () => clearTimeout(timer);
-  }, [displayedPlaceholder, placeholderIndex, placeholders]);
+  const send = () => {
+    if (!input.trim() || loading) return
+    const request = input.trim()
+    setMessages((current) => [...current, { id: `${Date.now()}-user`, role: 'user', content: request }])
+    setInput('')
+    setLoading(true)
+    window.setTimeout(() => {
+      setMessages((current) => [...current, { id: `${Date.now()}-assistant`, role: 'assistant', content: `I’ll turn “${request}” into a hardware plan. I’m checking requirements, power budget, connectivity, component availability, and manufacturing constraints before I propose the architecture.` }])
+      setLoading(false)
+    }, 900)
+  }
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const composer = <div className="mx-auto w-full max-w-[780px] px-5"><div className="flex h-[58px] items-center gap-2 rounded-full border border-foreground/15 bg-card/90 px-3 shadow-[0_14px_50px_rgba(0,0,0,0.22)] backdrop-blur-md transition-colors focus-within:border-foreground/35"><Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 rounded-full text-muted-foreground hover:text-foreground" title="Attach a file"><Paperclip className="h-4 w-4"/></Button><Input value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); send() } }} placeholder={placeholder || placeholderPrompts[0]} className="h-10 flex-1 border-0 bg-transparent px-1 text-sm shadow-none placeholder:text-muted-foreground/80 focus-visible:ring-0"/><Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 rounded-full text-muted-foreground hover:text-foreground" title="Use voice input"><Mic className="h-4 w-4"/></Button><Button onClick={send} disabled={!input.trim() || loading} size="icon" className="h-9 w-9 shrink-0 rounded-full bg-foreground text-background hover:bg-foreground/90">{loading ? <Loader2 className="h-4 w-4 animate-spin"/> : <ArrowUp className="h-4 w-4"/>}</Button></div><p className="mt-3 text-center text-[11px] text-muted-foreground">DunkAI can make mistakes. Review generated engineering decisions before manufacturing.</p></div>
 
-    // Add user message
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input,
-      timestamp: new Date(),
-    };
+  if (!messages.length) return <div className="relative flex h-full flex-col items-center justify-center overflow-hidden px-4 pb-20"><div className="pointer-events-none absolute left-1/2 top-1/2 h-[300px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/[0.07] blur-[90px]"/><div className="relative z-10 mb-8 flex max-w-[720px] flex-col items-center text-center"><div className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-secondary/90"><Sparkles className="h-4 w-4 text-muted-foreground"/></div><h1 className="font-display text-4xl tracking-tight sm:text-5xl">What are you building?</h1><p className="mt-4 max-w-lg text-sm leading-6 text-muted-foreground">Describe a hardware idea, ask for a design review, or bring an existing board into the workspace.</p></div><div className="relative z-10 w-full">{composer}</div><div className="relative z-10 mt-7 flex max-w-[760px] flex-wrap justify-center gap-2">{suggestions.map((suggestion) => <button key={suggestion} onClick={() => setInput(suggestion)} className="rounded-full border border-border bg-secondary/50 px-3 py-2 text-xs text-muted-foreground transition-colors hover:border-foreground/25 hover:text-foreground">{suggestion}</button>)}</div></div>
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
-
-    // Simulate AI response delay
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `I've analyzed your request. Here's what I\'ll do:
-
-1. **Requirement Analysis Agent** will extract and clarify your specifications
-2. **Hardware Architecture Agent** will design the system topology
-3. **Component Intelligence Agent** will select optimal components
-4. **Circuit & PCB Design Agent** will generate schematics
-5. **Validation Agent** will check for design rules and compatibility
-6. **Documentation Agent** will compile everything
-
-Your complete engineering design package will include:
-• System architecture and block diagrams
-• Detailed component BOM with suppliers
-• Full circuit schematics
-• PCB layout recommendations
-• Power analysis and battery estimates
-• Validation reports
-• Complete technical documentation`,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-background/50 via-background/40 to-background/50">
-      {/* Hero Section - When no messages */}
-      {messages.length === 0 && (
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-display tracking-tight leading-tight mb-6">
-            Design your
-            <br />
-            <span className="text-foreground/70">hardware</span>
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mb-12">
-            Describe your hardware idea in natural language and get manufacturing-ready specifications with schematics, BOMs, validation reports, and complete documentation.
-          </p>
-        </div>
-      )}
-
-      {/* Messages */}
-      {messages.length > 0 && (
-        <ScrollArea className="flex-1 px-6 py-4">
-        <div className="space-y-6 pr-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              {message.role === 'assistant' && (
-                <Avatar className="h-8 w-8 flex-shrink-0">
-                  <AvatarFallback className="bg-foreground/10 text-foreground text-xs font-bold">
-                    D
-                  </AvatarFallback>
-                </Avatar>
-              )}
-
-              <div
-                className={`max-w-2xl p-3 rounded-lg ${
-                  message.role === 'user'
-                    ? 'bg-foreground/10 text-foreground'
-                    : 'bg-background/40 text-foreground border border-foreground/10'
-                }`}
-              >
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                {message.isLoading && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <Loader className="w-4 h-4 animate-spin" />
-                    <span className="text-xs">Agents working...</span>
-                  </div>
-                )}
-              </div>
-
-              {message.role === 'user' && (
-                <Avatar className="h-8 w-8 flex-shrink-0">
-                  <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold">
-                    Y
-                  </AvatarFallback>
-                </Avatar>
-              )}
-            </div>
-          ))}
-
-          {isLoading && (
-            <div className="flex gap-3 justify-start">
-              <Avatar className="h-8 w-8 flex-shrink-0">
-                <AvatarFallback className="bg-foreground/10 text-foreground text-xs font-bold">
-                  D
-                </AvatarFallback>
-              </Avatar>
-              <div className="bg-background/40 text-foreground border border-foreground/10 p-3 rounded-lg flex items-center gap-2">
-                <Loader className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Processing your request...</span>
-              </div>
-            </div>
-          )}
-        </div>
-        </ScrollArea>
-      )}
-
-      {/* Input Area */}
-      <div className="border-t border-foreground/10 p-6 bg-gradient-to-t from-background/40 to-background/30 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto">
-          {/* Pill Input */}
-          <div className="flex items-center gap-3 px-6 py-3 bg-background/60 rounded-full border border-foreground/20 hover:border-foreground/40 transition-all duration-300 focus-within:border-foreground/60 focus-within:scale-105">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground transition-all duration-300 active:scale-90"
-            >
-              <Paperclip className="w-4 h-4" />
-            </Button>
-
-            <Input
-              placeholder={displayedPlaceholder || placeholders[0]}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              className="border-0 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm flex-1"
-            />
-
-            <Button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              size="icon"
-              className="h-8 w-8 bg-foreground hover:bg-foreground/90 text-background transition-all duration-300 active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <Loader className="w-4 h-4 animate-spin" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )}
-            </Button>
-          </div>
-
-          <p className="text-xs text-muted-foreground mt-4 text-center">
-            Powered by 6 specialized AI agents working in parallel
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+  return <div className="relative flex h-full flex-col"><div className="flex-1 overflow-auto"><div className="mx-auto flex w-full max-w-[820px] flex-col gap-8 px-5 py-10">{messages.map((message) => <div key={message.id} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>{message.role === 'assistant' && <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border bg-secondary"><Sparkles className="h-3.5 w-3.5 text-muted-foreground"/></div>}<div className={`max-w-[680px] text-sm leading-7 ${message.role === 'user' ? 'rounded-2xl bg-secondary px-4 py-3' : 'text-foreground'}`}>{message.content}</div></div>)}{loading && <div className="flex items-center gap-3 text-sm text-muted-foreground"><div className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-secondary"><Sparkles className="h-3.5 w-3.5"/></div><span className="animate-pulse">Working through the design constraints...</span></div>}</div></div><div className="border-t border-border bg-background/90 py-5 backdrop-blur-xl">{composer}</div></div>
 }

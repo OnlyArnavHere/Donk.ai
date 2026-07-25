@@ -88,7 +88,7 @@ export function ValidationView({ projectId }: ValidationViewProps) {
           <div className="grid grid-cols-4 gap-4">
             <div className="bg-secondary rounded-lg border border-border p-4">
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Passed</p>
-              <p className="text-3xl font-bold mt-1 text-green-500">6</p>
+              <p className="text-3xl font-bold mt-1 text-accent">6</p>
             </div>
             <div className="bg-secondary rounded-lg border border-border p-4">
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Warnings</p>
@@ -96,11 +96,11 @@ export function ValidationView({ projectId }: ValidationViewProps) {
             </div>
             <div className="bg-secondary rounded-lg border border-border p-4">
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Info</p>
-              <p className="text-3xl font-bold mt-1 text-blue-500">1</p>
+              <p className="text-3xl font-bold mt-1 text-accent">1</p>
             </div>
             <div className="bg-secondary rounded-lg border border-border p-4">
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Status</p>
-              <p className="text-2xl font-bold mt-1 text-green-500">Ready</p>
+              <p className="text-2xl font-bold mt-1 text-accent">Ready</p>
             </div>
           </div>
 
@@ -111,16 +111,16 @@ export function ValidationView({ projectId }: ValidationViewProps) {
                 key={check.id}
                 className={`rounded-lg border p-4 ${
                   check.status === 'passed'
-                    ? 'bg-green-500/5 border-green-500/20'
+                    ? 'bg-accent/5 border-accent/20'
                     : check.status === 'warning'
                     ? 'bg-amber-500/5 border-amber-500/20'
-                    : 'bg-blue-500/5 border-blue-500/20'
+                    : 'bg-accent/5 border-accent/20'
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  {check.status === 'passed' && <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />}
+                  {check.status === 'passed' && <CheckCircle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />}
                   {check.status === 'warning' && <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />}
-                  {check.status === 'info' && <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />}
+                  {check.status === 'info' && <AlertCircle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />}
 
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">

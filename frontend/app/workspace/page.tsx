@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { TopBar } from '@/components/workspace/top-bar';
 import { Sidebar } from '@/components/workspace/sidebar';
 import { MainEditor } from '@/components/workspace/main-editor';
@@ -9,6 +8,7 @@ import { MainEditor } from '@/components/workspace/main-editor';
 export default function WorkspacePage() {
   const [activeProject, setActiveProject] = useState('smart-iot-sensor');
   const [activeTab, setActiveTab] = useState('chat');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <div className="h-screen w-full flex flex-col bg-background text-foreground relative overflow-hidden noise-overlay">
@@ -22,19 +22,12 @@ export default function WorkspacePage() {
 
       <TopBar activeProject={activeProject} />
       
-      <ResizablePanelGroup direction="horizontal" className="flex-1">
-        {/* Left Sidebar */}
-        <ResizablePanel defaultSize={16} minSize={12} maxSize={25} className="border-r border-foreground/10">
-          <Sidebar activeProject={activeProject} setActiveProject={setActiveProject} setActiveTab={setActiveTab} />
-        </ResizablePanel>
-
-        <ResizableHandle className="w-px bg-gradient-to-b from-foreground/0 via-foreground/10 to-foreground/0 hover:bg-gradient-to-b hover:from-foreground/0 hover:via-foreground/20 hover:to-foreground/0 transition-colors cursor-col-resize" />
-
-        {/* Main Content */}
-        <ResizablePanel defaultSize={84} minSize={50} className="relative">
-          <MainEditor activeProject={activeProject} activeTab={activeTab} setActiveTab={setActiveTab} />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+      <div className="flex min-h-0 flex-1">
+        <aside className={`shrink-0 border-r border-foreground/10 transition-[width] duration-300 ${sidebarCollapsed ? 'w-[68px]' : 'w-[248px]'}`}>
+          <Sidebar activeProject={activeProject} setActiveProject={setActiveProject} setActiveTab={setActiveTab} collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((value) => !value)} />
+        </aside>
+        <main className="relative min-w-0 flex-1"><MainEditor activeProject={activeProject} activeTab={activeTab} setActiveTab={setActiveTab} /></main>
+      </div>
     </div>
   );
 }

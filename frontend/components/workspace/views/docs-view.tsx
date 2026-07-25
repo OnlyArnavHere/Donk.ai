@@ -1,147 +1,100 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { Download, FileText, ExternalLink } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from 'react'
+import { ChevronLeft, ChevronRight, Download, FileText, Maximize2, Search } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
-interface DocsViewProps {
-  projectId: string;
-}
+const docs = [
+  { title: 'System Architecture', file: 'architecture.pdf', size: '2.3 MB', pages: 8 },
+  { title: 'Circuit Schematic', file: 'schematic.pdf', size: '1.8 MB', pages: 4 },
+  { title: 'PCB Layout', file: 'pcb_layout.pdf', size: '3.1 MB', pages: 6 },
+  { title: 'Validation Report', file: 'validation.pdf', size: '0.8 MB', pages: 12 },
+]
 
-export function DocsView({ projectId }: DocsViewProps) {
-  const documents = [
-    { title: 'System Architecture', file: 'architecture.pdf', size: '2.3 MB', icon: FileText },
-    { title: 'Circuit Schematic', file: 'schematic.pdf', size: '1.8 MB', icon: FileText },
-    { title: 'PCB Layout', file: 'pcb_layout.pdf', size: '3.1 MB', icon: FileText },
-    { title: 'Component Datasheet Pack', file: 'datasheets.zip', size: '12.4 MB', icon: FileText },
-    { title: 'BOM & Suppliers', file: 'bom.xlsx', size: '0.5 MB', icon: FileText },
-    { title: 'Validation Report', file: 'validation.pdf', size: '0.8 MB', icon: FileText },
-  ];
+export function DocsView() {
+  const [selected, setSelected] = useState(0)
+  const [page, setPage] = useState(1)
+  const doc = docs[selected]
+
+  const selectDoc = (index: number) => {
+    setSelected(index)
+    setPage(1)
+  }
 
   return (
-    <div className="h-full flex flex-col bg-background">
-      <ScrollArea className="flex-1">
-        <div className="p-6 space-y-6 pr-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Engineering Design Package</h2>
-              <p className="text-xs text-muted-foreground mt-1">Complete manufacturing-ready documentation</p>
-            </div>
-            <Button variant="default" size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              <Download className="w-4 h-4 mr-2" />
-              Download All
-            </Button>
+    <div className="h-full overflow-auto bg-background p-5 lg:p-7">
+      <div className="mx-auto max-w-7xl space-y-5">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Project files</p>
+            <h2 className="mt-2 font-display text-4xl tracking-tight">Documentation</h2>
           </div>
-
-          {/* Tabs */}
-          <Tabs defaultValue="documents" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-secondary border border-border">
-              <TabsTrigger value="documents" className="text-xs">Documents</TabsTrigger>
-              <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
-              <TabsTrigger value="exports" className="text-xs">Exports</TabsTrigger>
-            </TabsList>
-
-            {/* Documents Tab */}
-            <TabsContent value="documents" className="space-y-3 mt-4">
-              {documents.map((doc, idx) => (
-                <div
-                  key={idx}
-                  className="bg-secondary rounded-lg border border-border p-4 hover:border-accent/50 transition-colors flex items-center justify-between group cursor-pointer"
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <FileText className="w-5 h-5 text-accent" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">{doc.title}</p>
-                      <p className="text-xs text-muted-foreground">{doc.file}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground">{doc.size}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-8 h-8 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Download className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </TabsContent>
-
-            {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-4 mt-4">
-              <div className="bg-secondary rounded-lg border border-border p-4">
-                <h3 className="font-semibold text-sm mb-3">Project Summary</h3>
-                <ul className="space-y-2 text-xs text-muted-foreground">
-                  <li className="flex gap-2"><span className="text-accent">→</span> Smart IoT Temperature Sensor with WiFi Connectivity</li>
-                  <li className="flex gap-2"><span className="text-accent">→</span> Target: Low-power battery operation (5+ years on AA batteries)</li>
-                  <li className="flex gap-2"><span className="text-accent">→</span> PCB Layers: 4-layer (FR-4, 1.6mm thickness)</li>
-                  <li className="flex gap-2"><span className="text-accent">→</span> Manufacturing: SMD assembly with pick-and-place compatible footprints</li>
-                </ul>
-              </div>
-
-              <div className="bg-secondary rounded-lg border border-border p-4">
-                <h3 className="font-semibold text-sm mb-3">Key Design Decisions</h3>
-                <ul className="space-y-2 text-xs text-muted-foreground">
-                  <li className="flex gap-2"><span className="text-accent">✓</span> STM32L476 chosen for ultra-low power consumption (sleep: 1.4μA)</li>
-                  <li className="flex gap-2"><span className="text-accent">✓</span> ESP32-S3 for integrated WiFi with antenna on-chip</li>
-                  <li className="flex gap-2"><span className="text-accent">✓</span> TMP117 for high-accuracy temperature (±0.1°C)</li>
-                  <li className="flex gap-2"><span className="text-accent">✓</span> Separate power domains to minimize cross-talk</li>
-                </ul>
-              </div>
-
-              <div className="bg-secondary rounded-lg border border-border p-4">
-                <h3 className="font-semibold text-sm mb-3">Manufacturing Notes</h3>
-                <ul className="space-y-2 text-xs text-muted-foreground">
-                  <li className="flex gap-2"><span className="text-accent">→</span> IPC-A-610 Class 2 recommended for quality assurance</li>
-                  <li className="flex gap-2"><span className="text-accent">→</span> BGA components: 0.4mm pitch requires X-ray inspection</li>
-                  <li className="flex gap-2"><span className="text-accent">→</span> Reflow profile: Lead-free Sn/Ag/Cu (SAC305)</li>
-                  <li className="flex gap-2"><span className="text-accent">→</span> Test points included for boundary scan testing</li>
-                </ul>
-              </div>
-            </TabsContent>
-
-            {/* Exports Tab */}
-            <TabsContent value="exports" className="space-y-4 mt-4">
-              <div className="bg-secondary rounded-lg border border-border p-4">
-                <h3 className="font-semibold text-sm mb-4">Export Formats Available</h3>
-                <div className="space-y-2 text-xs text-muted-foreground">
-                  <p className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-accent"></span>
-                    PDF (vector graphics, ideal for documentation)
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-accent"></span>
-                    Gerber RS-274X (CAM file for PCB manufacturing)
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-accent"></span>
-                    STEP 3D models (for mechanical CAD integration)
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-accent"></span>
-                    Netlist (Spice simulation)
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-accent"></span>
-                    JSON (programmatic access to design data)
-                  </p>
-                </div>
-              </div>
-
-              <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Download className="w-4 h-4 mr-2" />
-                Download Complete Package
-              </Button>
-            </TabsContent>
-          </Tabs>
+          <Button variant="outline" className="rounded-xl"><Download className="mr-2 h-4 w-4" />Download package</Button>
         </div>
-      </ScrollArea>
+
+        <div className="grid min-h-[600px] gap-4 xl:grid-cols-[250px_minmax(0,1fr)]">
+          <aside className="rounded-2xl border border-border bg-card p-3">
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input placeholder="Filter files" className="h-9 rounded-lg border-border bg-secondary/50 pl-9 text-xs" />
+            </div>
+            <p className="mb-2 px-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Design package</p>
+            <div className="space-y-1">
+              {docs.map((item, index) => (
+                <button key={item.file} onClick={() => selectDoc(index)} className={`w-full rounded-xl p-3 text-left transition-colors ${selected === index ? 'bg-secondary' : 'hover:bg-secondary/60'}`}>
+                  <div className="flex gap-3">
+                    <FileText className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-medium">{item.title}</p>
+                      <p className="mt-1 truncate font-mono text-[10px] text-muted-foreground">{item.file}</p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </aside>
+
+          <section className="flex min-h-[600px] min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
+              <div>
+                <p className="text-sm font-medium">{doc.title}</p>
+                <p className="mt-1 font-mono text-[10px] text-muted-foreground">{doc.file} · {doc.size}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" title="Previous page" onClick={() => setPage((current) => Math.max(1, current - 1))}><ChevronLeft className="h-4 w-4" /></Button>
+                <span className="min-w-16 text-center font-mono text-[10px] text-muted-foreground">{page} / {doc.pages}</span>
+                <Button variant="ghost" size="icon" title="Next page" onClick={() => setPage((current) => Math.min(doc.pages, current + 1))}><ChevronRight className="h-4 w-4" /></Button>
+                <div className="ml-2 h-5 w-px bg-border" />
+                <Button variant="ghost" size="icon" title="Full screen"><Maximize2 className="h-4 w-4" /></Button>
+              </div>
+            </div>
+
+            <div className="flex flex-1 items-start justify-center overflow-auto bg-secondary/35 p-6 lg:p-10">
+              <article className="min-h-[670px] w-full max-w-[720px] rounded-sm border border-border bg-background px-8 py-10 text-foreground shadow-[0_16px_50px_rgba(0,0,0,0.18)] sm:px-14">
+                <div className="flex items-start justify-between border-b border-border pb-7">
+                  <div>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground">DUNKAI / ENGINEERING PACKAGE</p>
+                    <h3 className="mt-4 font-display text-3xl">{doc.title}</h3>
+                    <p className="mt-2 text-xs text-muted-foreground">Smart IoT Sensor Hub · Revision 03</p>
+                  </div>
+                  <span className="font-mono text-[10px] text-muted-foreground">{String(page).padStart(2, '0')}</span>
+                </div>
+                <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-6 border-b border-border pb-8 sm:grid-cols-4">
+                  {['Owner|DunkAI Systems', 'Status|Review ready', 'Format|PDF / A4', 'Updated|Today'].map((item) => {
+                    const [label, value] = item.split('|')
+                    return <div key={label}><p className="font-mono text-[9px] uppercase text-muted-foreground">{label}</p><p className="mt-2 text-xs">{value}</p></div>
+                  })}
+                </div>
+                <h4 className="mt-10 text-sm font-medium">Engineering notes</h4>
+                <p className="mt-4 max-w-2xl text-xs leading-6 text-muted-foreground">This document is part of the manufacturing handoff for the current sensor hub design. Review the highlighted constraints, interface decisions, and verification notes before exporting fabrication files.</p>
+                <div className="mt-8 space-y-3"><div className="h-2 w-4/5 rounded-full bg-secondary" /><div className="h-2 w-full rounded-full bg-secondary" /><div className="h-2 w-11/12 rounded-full bg-secondary" /><div className="mt-8 h-36 rounded-xl border border-dashed border-border bg-secondary/30" /></div>
+                <div className="mt-14 flex items-center justify-between border-t border-border pt-4 font-mono text-[9px] text-muted-foreground"><span>CONFIDENTIAL · INTERNAL DESIGN REVIEW</span><span>DUNKAI</span></div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
-  );
+  )
 }

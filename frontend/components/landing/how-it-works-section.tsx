@@ -5,38 +5,38 @@ import { useEffect, useRef, useState } from "react";
 const steps = [
   {
     number: "I",
-    title: "Connect your tools",
-    description: "Integrate with your existing stack in minutes. We support 200+ data sources out of the box.",
-    code: `import { optimus } from '@optimus/core'
+    title: "Describe your hardware",
+    description: "Start with a natural-language brief. DunkAI extracts requirements, constraints, interfaces, and open questions.",
+    code: `const brief = await dunkai.requirements({
+  idea: 'low-power temperature sensor',
+  connectivity: 'WiFi',
+  batteryLife: '5+ years'
+})
 
-optimus.connect({
-  source: 'your-database',
-  sync: true
-})`,
+// Requirements mapped`,
   },
   {
     number: "II",
-    title: "Build your workflow",
-    description: "Design powerful automations with our visual builder or write code directly.",
-    code: `optimus.workflow('process', {
-  trigger: 'event',
-  actions: [
-    'validate',
-    'transform', 
-    'deliver'
-  ]
-})`,
+    title: "Explore the design",
+    description: "Move through architecture, components, power, and validation in one connected workspace.",
+    code: `const design = await dunkai.design({
+  architecture: 'sensor-hub',
+  components: ['STM32L476', 'TMP117'],
+  validate: true
+})
+
+// Design reviewed`,
   },
   {
     number: "III",
-    title: "Ship to production",
-    description: "Deploy globally with zero configuration. Your app goes live in under 30 seconds.",
-    code: `optimus.deploy({
-  target: 'production',
-  regions: 'auto'
+    title: "Hand off the board",
+    description: "Export a board-ready package with BOM, schematics, KiCad PCB files, validation notes, and documentation.",
+    code: `const package = await dunkai.export({
+  formats: ['kicad', 'bom', 'pdf'],
+  include: ['validation', 'docs']
 })
 
-// Deployed to 12 regions`,
+// Ready for review`,
   },
 ];
 
@@ -88,16 +88,16 @@ export function HowItWorksSection() {
         <div className="mb-16 lg:mb-24">
           <span className="inline-flex items-center gap-3 text-sm font-mono text-background/50 mb-6">
             <span className="w-8 h-px bg-background/30" />
-            Process
+            DunkAI workflow
           </span>
           <h2
             className={`text-4xl lg:text-6xl font-display tracking-tight transition-all duration-700 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            Three steps.
+            From idea.
             <br />
-            <span className="text-background/50">Infinite possibilities.</span>
+            <span className="text-background/50">To a board.</span>
           </h2>
         </div>
 
@@ -151,7 +151,7 @@ export function HowItWorksSection() {
                   <div className="w-3 h-3 rounded-full bg-background/20" />
                   <div className="w-3 h-3 rounded-full bg-background/20" />
                 </div>
-                <span className="text-xs font-mono text-background/40">workflow.ts</span>
+                <span className="text-xs font-mono text-background/40">design-package.ts</span>
               </div>
 
               {/* Code content */}
@@ -186,8 +186,8 @@ export function HowItWorksSection() {
 
               {/* Status */}
               <div className="px-6 py-4 border-t border-background/10 flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-xs font-mono text-background/40">Ready</span>
+                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                <span className="text-xs font-mono text-background/40">Design package ready</span>
               </div>
             </div>
           </div>

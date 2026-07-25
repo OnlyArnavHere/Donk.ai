@@ -205,7 +205,7 @@ export function RightPanel({ activeProject }: RightPanelProps) {
                       <div
                         className={`h-full transition-all ${
                           agent.status === 'completed'
-                            ? 'bg-green-500'
+                            ? 'bg-accent'
                             : agent.status === 'in-progress'
                             ? 'bg-accent'
                             : 'bg-muted'
@@ -220,8 +220,8 @@ export function RightPanel({ activeProject }: RightPanelProps) {
                   <div className="mt-2 flex items-center gap-1">
                     {agent.status === 'completed' && (
                       <>
-                        <CheckCircle className="w-3 h-3 text-green-500" />
-                        <span className="text-xs text-green-500 font-medium">Completed</span>
+                        <CheckCircle className="w-3 h-3 text-accent" />
+                        <span className="text-xs text-accent font-medium">Completed</span>
                       </>
                     )}
                     {agent.status === 'in-progress' && (
@@ -288,7 +288,7 @@ export function RightPanel({ activeProject }: RightPanelProps) {
               <div key={idx} className="bg-sidebar-accent rounded-lg p-3 hover:bg-sidebar-accent/80 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                    collab.status === 'online' ? 'bg-green-500/20 text-green-500' :
+                    collab.status === 'online' ? 'bg-accent/20 text-accent' :
                     collab.status === 'idle' ? 'bg-amber-500/20 text-amber-500' :
                     'bg-muted text-sidebar-foreground/60'
                   }`}>
@@ -299,7 +299,7 @@ export function RightPanel({ activeProject }: RightPanelProps) {
                     <p className="text-xs text-sidebar-foreground/60">{collab.role}</p>
                   </div>
                   <div className={`w-2 h-2 rounded-full ${
-                    collab.status === 'online' ? 'bg-green-500' :
+                    collab.status === 'online' ? 'bg-accent' :
                     collab.status === 'idle' ? 'bg-amber-500' :
                     'bg-muted'
                   }`}></div>

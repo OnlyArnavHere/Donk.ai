@@ -5,7 +5,18 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { AnimatedSphere } from "./animated-sphere";
 
-const words = ["design", "engineer", "innovate", "manufacture"];
+const words = ["design", "product", "innovation", "prototype"];
+const stats = [
+  { value: "10x", label: "faster design time", company: "HARDWARE" },
+  { value: "100%", label: "manufacturing ready", company: "ENGINEERING" },
+  { value: "6", label: "AI agents working", company: "IN PARALLEL" },
+  { value: "1 day", label: "from idea to plan", company: "TO REALITY" },
+  { value: "42", label: "connected nets", company: "SYSTEM MAP" },
+  { value: "4-layer", label: "PCB starting point", company: "KICAD READY" },
+  { value: "5+ yrs", label: "battery target", company: "LOW POWER" },
+  { value: "0.1°C", label: "sensor accuracy", company: "VALIDATED" },
+  { value: "8", label: "design artifacts", company: "ONE PACKAGE" },
+];
 
 export function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
@@ -71,7 +82,7 @@ export function HeroSection() {
         {/* Main headline */}
         <div className="mb-12">
           <h1 
-            className={`text-[clamp(3rem,12vw,10rem)] font-display leading-[0.9] tracking-tight transition-all duration-1000 ${
+            className={`max-w-[980px] text-[clamp(3.4rem,9.5vw,8.5rem)] font-display leading-[0.9] tracking-tight transition-all duration-1000 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
@@ -145,15 +156,10 @@ export function HeroSection() {
           isVisible ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="flex gap-16 marquee whitespace-nowrap">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="flex gap-16">
-              {[
-                { value: "10x", label: "faster design time", company: "HARDWARE" },
-                { value: "100%", label: "manufacturing ready", company: "ENGINEERING" },
-                { value: "6", label: "AI agents working", company: "IN PARALLEL" },
-                { value: "1 day", label: "from idea to plan", company: "TO REALITY" },
-              ].map((stat) => (
+        <div className="marquee flex w-max whitespace-nowrap">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="flex shrink-0 gap-16 pr-16">
+              {stats.map((stat) => (
                 <div key={`${stat.company}-${i}`} className="flex items-baseline gap-4">
                   <span className="text-4xl lg:text-5xl font-display">{stat.value}</span>
                   <span className="text-sm text-muted-foreground">

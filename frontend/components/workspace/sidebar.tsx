@@ -17,15 +17,19 @@ import {
   Folder,
   Clock,
   Bookmark,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 
 interface SidebarProps {
   activeProject: string;
   setActiveProject: (project: string) => void;
   setActiveTab: (tab: string) => void;
+  collapsed?: boolean;
+  onToggle?: () => void;
 }
 
-export function Sidebar({ activeProject, setActiveProject, setActiveTab }: SidebarProps) {
+export function Sidebar({ activeProject, setActiveProject, setActiveTab, collapsed = false, onToggle }: SidebarProps) {
   const projects = [
     {
       id: 'smart-iot-sensor',
@@ -54,6 +58,7 @@ export function Sidebar({ activeProject, setActiveProject, setActiveTab }: Sideb
     { id: 'bom', label: 'BOM', icon: Package },
     { id: 'validation', label: 'Validation', icon: CheckCircle },
     { id: 'docs', label: 'Documentation', icon: FileText },
+    { id: 'pcb', label: 'PCB board', icon: Package },
   ];
 
   return (
@@ -61,28 +66,28 @@ export function Sidebar({ activeProject, setActiveProject, setActiveTab }: Sideb
       {/* Header */}
       <div className="p-4 border-b border-foreground/10">
         <div className="flex items-center justify-between gap-2 mb-4">
-          <h1 className="text-sm font-display tracking-tight flex items-center gap-2">
+          {!collapsed && <h1 className="text-sm font-display tracking-tight flex items-center gap-2">
             DunkAI
-          </h1>
-          <Button size="icon" variant="ghost" className="h-7 w-7 text-foreground/70 hover:text-foreground transition-colors duration-300">
-            <Plus className="w-4 h-4" />
+          </h1>}
+          <Button onClick={onToggle} size="icon" variant="outline" aria-label={collapsed ? 'Show sidebar' : 'Hide sidebar'} title={collapsed ? 'Show sidebar' : 'Hide sidebar'} className="h-8 w-8 rounded-lg border-border bg-secondary/40 text-foreground hover:bg-secondary">
+            {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
           </Button>
         </div>
         
-        <div className="relative group">
+        {!collapsed && <div className="relative group">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 text-muted-foreground transition-colors group-focus-within:text-foreground" />
           <Input
             placeholder="Search..."
             className="pl-8 h-8 bg-background/50 border border-foreground/10 text-xs text-foreground placeholder:text-muted-foreground hover:border-foreground/20 focus:border-foreground/30 transition-all duration-300 rounded-md"
           />
-        </div>
+        </div>}
       </div>
 
       <ScrollArea className="flex-1">
         {/* Projects Section */}
         <div className="p-4">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold uppercase text-sidebar-foreground/50 tracking-wider">Projects</p>
+            {!collapsed && <p className="text-xs font-semibold uppercase text-sidebar-foreground/50 tracking-wider">Projects</p>}
             <Folder className="w-3 h-3 text-sidebar-foreground/50" />
           </div>
 
@@ -103,11 +108,11 @@ export function Sidebar({ activeProject, setActiveProject, setActiveTab }: Sideb
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <Icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="text-xs font-medium truncate">{project.name}</span>
+                      {!collapsed && <span className="text-xs font-medium truncate">{project.name}</span>}
                     </div>
-                    <p className="text-xs text-sidebar-foreground/60 mt-1">{project.status}</p>
+                    {!collapsed && <p className="text-xs text-sidebar-foreground/60 mt-1">{project.status}</p>}
                   </div>
-                  {isActive && <ChevronRight className="w-4 h-4 flex-shrink-0" />}
+                  {isActive && !collapsed && <ChevronRight className="w-4 h-4 flex-shrink-0" />}
                 </button>
               );
             })}
@@ -121,7 +126,7 @@ export function Sidebar({ activeProject, setActiveProject, setActiveTab }: Sideb
 
         {/* Views Section */}
         <div className="p-4">
-          <p className="text-xs font-semibold uppercase text-sidebar-foreground/50 tracking-wider mb-3">Views</p>
+          {!collapsed && <p className="text-xs font-semibold uppercase text-sidebar-foreground/50 tracking-wider mb-3">Views</p>}
           <div className="space-y-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -132,7 +137,7 @@ export function Sidebar({ activeProject, setActiveProject, setActiveTab }: Sideb
                   className="w-full text-left px-3 py-2 rounded-lg transition-all duration-300 text-foreground hover:bg-foreground/5 hover:text-foreground active:scale-95 active:bg-foreground/10 flex items-center gap-2 text-xs"
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="font-medium">{tab.label}</span>
+                  {!collapsed && <span className="font-medium">{tab.label}</span>}
                 </button>
               );
             })}
@@ -145,7 +150,7 @@ export function Sidebar({ activeProject, setActiveProject, setActiveTab }: Sideb
         </div>
 
         {/* Recent Section */}
-        <div className="p-4">
+        {!collapsed && <div className="p-4">
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-semibold uppercase text-sidebar-foreground/50 tracking-wider">Recent</p>
             <Clock className="w-3 h-3 text-sidebar-foreground/50" />
@@ -164,18 +169,18 @@ export function Sidebar({ activeProject, setActiveProject, setActiveTab }: Sideb
               <p className="text-sidebar-foreground/50 text-xs mt-1">1d ago</p>
             </div>
           </div>
-        </div>
+        </div>}
       </ScrollArea>
 
       {/* Footer */}
       <div className="p-4 border-t border-sidebar-border space-y-2">
-        <Button variant="outline" size="sm" className="w-full text-xs border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent">
+        {!collapsed && <Button variant="outline" size="sm" className="w-full text-xs border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent">
           Upgrade
-        </Button>
-        <Button variant="ghost" size="sm" className="w-full text-xs text-sidebar-foreground hover:bg-sidebar-accent flex items-center gap-2">
+        </Button>}
+        {!collapsed && <Button variant="ghost" size="sm" className="w-full text-xs text-sidebar-foreground hover:bg-sidebar-accent flex items-center gap-2">
           <Settings className="w-4 h-4" />
           Settings
-        </Button>
+        </Button>}
       </div>
     </div>
   );

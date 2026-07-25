@@ -16,27 +16,55 @@
   --secondary-foreground: #e0e0e0;
   --muted: #424242;
   --muted-foreground: #a0a0a0;
-  --accent: #3b82f6;
-  --accent-foreground: #ffffff;
+  --accent: #b9c0ca;
+  --accent-foreground: #111316;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   --border: #262626;
   --input: #1a1a1a;
-  --ring: #3b82f6;
-  --chart-1: #3b82f6;
-  --chart-2: #8b5cf6;
-  --chart-3: #ec4899;
-  --chart-4: #f59e0b;
-  --chart-5: #10b981;
+  --ring: #aeb6c1;
+  --chart-1: #b9c0ca;
+  --chart-2: #8e98a6;
+  --chart-3: #d5d9df;
+  --chart-4: #6d7785;
+  --chart-5: #a2aab5;
   --radius: 0.5rem;
   --sidebar: #0f0f0f;
   --sidebar-foreground: #e5e5e5;
-  --sidebar-primary: #3b82f6;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1f2937;
+  --sidebar-primary: #b9c0ca;
+  --sidebar-primary-foreground: #111316;
+  --sidebar-accent: #24272c;
   --sidebar-accent-foreground: #e5e5e5;
   --sidebar-border: #262626;
-  --sidebar-ring: #3b82f6;
+  --sidebar-ring: #aeb6c1;
+}
+
+.light {
+  --background: #f4f3ee;
+  --foreground: #171813;
+  --card: #ffffff;
+  --card-foreground: #171813;
+  --popover: #ffffff;
+  --popover-foreground: #171813;
+  --primary: #171813;
+  --primary-foreground: #ffffff;
+  --secondary: #ebeae3;
+  --secondary-foreground: #2b2d25;
+  --muted: #d8d8cf;
+  --muted-foreground: #6d6f65;
+  --border: #d9d9cf;
+  --input: #ffffff;
+  --sidebar: #eeeee7;
+  --sidebar-foreground: #292b24;
+  --sidebar-accent: #e2e4d7;
+  --sidebar-border: #d9d9cf;
+  --accent: #59616e;
+  --accent-foreground: #ffffff;
+  --ring: #59616e;
+  --sidebar-primary: #59616e;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e2e4e8;
+  --sidebar-ring: #59616e;
 }
 
 @theme inline {
@@ -104,7 +132,8 @@
   }
   
   .marquee {
-    animation: marquee 30s linear infinite;
+    animation: marquee 34s linear infinite;
+    will-change: transform;
   }
   
   .marquee-reverse {
@@ -113,7 +142,7 @@
 
   @keyframes marquee {
     0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    100% { transform: translate3d(-33.333333%, 0, 0); }
   }
   
   @keyframes marquee-reverse {
