@@ -1,8 +1,36 @@
-import { Chat } from '../models/Chat.js'; import { Message } from '../models/Message.js'; import { asyncHandler } from '../utils/asyncHandler.js'; import { send } from '../utils/response.js'; import { ApiError } from '../utils/ApiError.js'; import { getProject } from '../services/project.service.js'; import { callSupervisor } from '../services/supervisor.service.js';
-const chat = async(id,user) => { const c=await Chat.findOne({_id:id,user:user._id}); if(!c) throw ApiError.notFound('Chat not found'); return c; };
-export const create=asyncHandler(async(req,res)=>{await getProject(req.body.project,req.user);send(res,{status:201,data:await Chat.create({project:req.body.project,user:req.user._id,title:req.body.title})});});
-export const list=asyncHandler(async(req,res)=>send(res,{data:await Chat.find({project:req.params.projectId,user:req.user._id})}));
-export const messages=asyncHandler(async(req,res)=>{await chat(req.params.id,req.user);send(res,{data:await Message.find({chat:req.params.id}).sort({createdAt:1})});});
-export const remove=asyncHandler(async(req,res)=>{await chat(req.params.id,req.user);await Chat.findByIdAndDelete(req.params.id);await Message.deleteMany({chat:req.params.id});send(res,{message:'Chat deleted'});});
-export const rename=asyncHandler(async(req,res)=>send(res,{data:await Chat.findByIdAndUpdate((await chat(req.params.id,req.user))._id,{title:req.body.title},{new:true})}));
-export const sendMessage=asyncHandler(async(req,res)=>{const c=await chat(req.params.id,req.user);const prior=await Message.find({chat:c._id}).sort({createdAt:1}).limit(100);const userMessage=await Message.create({chat:c._id,sender:req.user._id,type:'user',content:req.body.content});const result=await callSupervisor({action:'chat',project:c.project,messages:[...prior,userMessage].map(m=>({type:m.type,content:m.content}))});const assistant=await Message.create({chat:c._id,type:'assistant',content:result.message||result.content||JSON.stringify(result),metadata:result});send(res,{status:201,data:{userMessage,assistant}});});
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { send } from '../utils/response.js';
+import * as service from '../services/chat.service.js';
+
+export const create = asyncHandler(async (req, res) => {
+  send(res, { status: 201, message: 'Chat created', data: await service.createChat(req.body, req.user) });
+});
+
+export const list = asyncHandler(async (req, res) => {
+  send(res, { data: await service.listChats(req.params.projectId, req.user, req.query) });
+});
+
+export const messages = asyncHandler(async (req, res) => {
+  send(res, { data: await service.getMessages(req.params.id, req.user, req.query) });
+});
+
+export const sendMessage = asyncHandler(async (req, res) => {
+  send(res, {
+    status: 201,
+    message: 'Message sent',
+    data: await service.sendMessage(req.params.id, req.body, req.user, req),
+  });
+});
+
+export const rename = asyncHandler(async (req, res) => {
+  send(res, { message: 'Chat renamed', data: await service.renameChat(req.params.id, req.body.title, req.user) });
+});
+
+export const remove = asyncHandler(async (req, res) => {
+  await service.deleteChat(req.params.id, req.user);
+  send(res, { message: 'Chat deleted' });
+});
+
+export const togglePin = asyncHandler(async (req, res) => {
+  send(res, { data: await service.togglePin(req.params.id, req.user) });
+});

@@ -1,10 +1,213 @@
 import { Project } from '../models/Project.js';
 import { ApiError } from '../utils/ApiError.js';
-const access = (p, user, write = false) => { const member = p.members.find(m => m.user.toString() === user._id.toString()); if (p.owner.toString() !== user._id.toString() && (!member || (write && member.role !== 'editor'))) throw ApiError.forbidden(); };
-export const getProject = async (id, user, write = false) => { const p = await Project.findById(id).populate('owner members.user'); if (!p) throw ApiError.notFound('Project not found'); access(p, user, write); return p; };
-export const listProjects = (user) => Project.find({ $or: [{ owner: user._id }, { 'members.user': user._id }] }).sort({ createdAt: -1 });
-export const createProject = (data, user) => Project.create({ ...data, owner: user._id });
-export const updateProject = async (id, data, user) => { await getProject(id, user, true); return Project.findByIdAndUpdate(id, data, { new: true, runValidators: true }); };
-export const deleteProject = async (id, user) => { const p = await Project.findOne({ _id: id, owner: user._id }); if (!p) throw ApiError.notFound('Project not found'); await p.deleteOne(); return p; };
-export const shareProject = async (id, email, role, user) => { const p = await getProject(id, user, true); const target = await (await import('../models/User.js')).User.findOne({ email }); if (!target) throw ApiError.notFound('User not found'); p.members = p.members.filter(m => m.user.toString() !== target._id.toString()); p.members.push({ user: target._id, role }); return p.save(); };
-export const duplicateProject = async (id, user) => { const p = await getProject(id, user); const copy = p.toObject(); delete copy._id; delete copy.createdAt; delete copy.updatedAt; copy.title = `${copy.title} (Copy)`; copy.owner = user._id; return Project.create(copy); };
+import { parsePagination, buildPaginatedResponse } from '../helpers/pagination.js';
+import { logActivity } from '../helpers/activity.js';
+import { notify } from '../helpers/notification.js';
+
+// ---- Access control ----
+
+export const getProject = async (id, user, write = false) => {
+  const project = await Project.findById(id).populate('owner members.user', 'name email avatar');
+  if (!project) throw ApiError.notFound('Project not found');
+
+  const isOwner = project.owner._id.toString() === user._id.toString();
+  const member = project.members.find((m) => m.user?._id?.toString() === user._id.toString());
+
+  if (!isOwner && !member) throw ApiError.forbidden('You do not have access to this project');
+  if (write && !isOwner && member?.role !== 'editor') {
+    throw ApiError.forbidden('You need editor access for this action');
+  }
+
+  return project;
+};
+
+// ---- List projects (paginated, filterable, sortable) ----
+
+export const listProjects = async (user, query = {}) => {
+  const { page, limit, skip, sort } = parsePagination(query);
+
+  const baseFilter = {
+    $or: [{ owner: user._id }, { 'members.user': user._id }],
+  };
+
+  // Apply status filter
+  if (query.status && ['active', 'archived'].includes(query.status)) {
+    baseFilter.status = query.status;
+  }
+
+  // Apply favourite filter
+  if (query.favourite === 'true') {
+    baseFilter.isFavourite = true;
+  }
+
+  // Apply search
+  if (query.search) {
+    baseFilter.$and = [
+      baseFilter.$or ? { $or: baseFilter.$or } : {},
+      { $text: { $search: query.search } },
+    ];
+    delete baseFilter.$or;
+  }
+
+  const [items, total] = await Promise.all([
+    Project.find(baseFilter).populate('owner', 'name email avatar').sort(sort).skip(skip).limit(limit),
+    Project.countDocuments(baseFilter),
+  ]);
+
+  return buildPaginatedResponse(items, total, { page, limit });
+};
+
+// ---- Recent projects ----
+
+export const getRecentProjects = (user, limit = 5) =>
+  Project.find({ $or: [{ owner: user._id }, { 'members.user': user._id }], status: 'active' })
+    .sort({ updatedAt: -1 })
+    .limit(limit)
+    .populate('owner', 'name email avatar');
+
+// ---- Favourite projects ----
+
+export const getFavouriteProjects = (user) =>
+  Project.find({ $or: [{ owner: user._id }, { 'members.user': user._id }], isFavourite: true })
+    .sort({ updatedAt: -1 })
+    .populate('owner', 'name email avatar');
+
+// ---- Create ----
+
+export const createProject = async (data, user, req = null) => {
+  const project = await Project.create({
+    ...data,
+    owner: user._id,
+  });
+
+  await logActivity('project_created', user._id, { projectId: project._id, title: project.title }, req);
+  return project;
+};
+
+// ---- Update ----
+
+export const updateProject = async (id, data, user, req = null) => {
+  const project = await getProject(id, user, true);
+  Object.assign(project, data);
+  await project.save();
+
+  await logActivity('project_updated', user._id, { projectId: project._id }, req);
+  return project;
+};
+
+// ---- Delete ----
+
+export const deleteProject = async (id, user, req = null) => {
+  const project = await Project.findOne({ _id: id, owner: user._id });
+  if (!project) throw ApiError.notFound('Project not found or you are not the owner');
+
+  await project.deleteOne();
+
+  await logActivity('project_deleted', user._id, { projectId: id }, req);
+  return project;
+};
+
+// ---- Archive / Unarchive ----
+
+export const archiveProject = async (id, user, req = null) => {
+  const project = await getProject(id, user, true);
+  project.status = 'archived';
+  await project.save();
+  await logActivity('project_updated', user._id, { projectId: id, action: 'archived' }, req);
+  return project;
+};
+
+// ---- Duplicate ----
+
+export const duplicateProject = async (id, user, req = null) => {
+  const original = await getProject(id, user);
+  const copy = original.toObject();
+
+  delete copy._id;
+  delete copy.__v;
+  delete copy.createdAt;
+  delete copy.updatedAt;
+
+  copy.title = `${copy.title} (Copy)`;
+  copy.owner = user._id;
+  copy.members = [];
+  copy.isFavourite = false;
+  copy.status = 'active';
+
+  const newProject = await Project.create(copy);
+
+  await logActivity('project_created', user._id, { projectId: newProject._id, duplicatedFrom: id }, req);
+  return newProject;
+};
+
+// ---- Toggle favourite ----
+
+export const toggleFavourite = async (id, user) => {
+  const project = await getProject(id, user);
+  project.isFavourite = !project.isFavourite;
+  await project.save();
+  return { isFavourite: project.isFavourite };
+};
+
+// ---- Share ----
+
+export const shareProject = async (id, email, role, user, req = null) => {
+  const project = await getProject(id, user, true);
+  const { User } = await import('../models/User.js');
+  const target = await User.findOne({ email: email.toLowerCase() });
+
+  if (!target) throw ApiError.notFound('User not found with that email');
+  if (target._id.toString() === user._id.toString()) {
+    throw ApiError.badRequest('You cannot share a project with yourself');
+  }
+
+  // Remove existing member if present
+  project.members = project.members.filter(
+    (m) => m.user.toString() !== target._id.toString()
+  );
+  project.members.push({ user: target._id, role: role || 'viewer' });
+  await project.save();
+
+  await notify(target._id, {
+    type: 'project_shared',
+    title: 'Project shared with you',
+    message: `${user.name} shared "${project.title}" with you as ${role || 'viewer'}`,
+    data: { projectId: project._id, role: role || 'viewer' },
+    project: project._id,
+  });
+
+  await logActivity('project_shared', user._id, { projectId: id, sharedWith: target._id }, req);
+  return project;
+};
+
+// ---- Remove member ----
+
+export const removeMember = async (id, memberId, user) => {
+  const project = await getProject(id, user, true);
+  project.members = project.members.filter((m) => m.user.toString() !== memberId);
+  await project.save();
+  return project;
+};
+
+// ---- Search ----
+
+export const searchProjects = async (user, query) => {
+  const { page, limit, skip } = parsePagination(query);
+  const filter = {
+    $and: [
+      { $or: [{ owner: user._id }, { 'members.user': user._id }] },
+      { $text: { $search: query.q || '' } },
+    ],
+  };
+
+  const [items, total] = await Promise.all([
+    Project.find(filter, { score: { $meta: 'textScore' } })
+      .sort({ score: { $meta: 'textScore' } })
+      .skip(skip)
+      .limit(limit)
+      .populate('owner', 'name email avatar'),
+    Project.countDocuments(filter),
+  ]);
+
+  return buildPaginatedResponse(items, total, { page, limit });
+};

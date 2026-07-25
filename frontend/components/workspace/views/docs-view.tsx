@@ -12,7 +12,7 @@ const docs = [
   { title: 'Validation Report', file: 'validation.pdf', size: '0.8 MB', pages: 12 },
 ]
 
-export function DocsView() {
+export function DocsView({ projectId: _projectId }: { projectId?: string } = {}) {
   const [selected, setSelected] = useState(0)
   const [page, setPage] = useState(1)
   const doc = docs[selected]

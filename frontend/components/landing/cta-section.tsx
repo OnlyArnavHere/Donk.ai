@@ -39,11 +39,11 @@ export function CtaSection() {
           }`}
           onMouseMove={handleMouseMove}
         >
-          {/* Spotlight effect */}
+          {/* Spotlight effect — uses currentColor so it works in both themes */}
           <div 
-            className="absolute inset-0 opacity-10 pointer-events-none transition-opacity duration-300"
+            className="absolute inset-0 opacity-10 pointer-events-none transition-opacity duration-300 text-foreground"
             style={{
-              background: `radial-gradient(600px circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(0,0,0,0.15), transparent 40%)`
+              background: `radial-gradient(600px circle at ${mousePosition.x}% ${mousePosition.y}%, currentColor, transparent 40%)`
             }}
           />
           
@@ -58,25 +58,29 @@ export function CtaSection() {
                 </h2>
 
                 <p className="text-xl text-muted-foreground mb-12 leading-relaxed max-w-xl">
-                  Join thousands of teams shipping faster with Optimus. 
+                  Join engineering teams shipping hardware faster with DunkAI. 
                   Start free, scale infinitely.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-start gap-4">
-                  <Button
-                    size="lg"
-                    className="bg-foreground hover:bg-foreground/90 text-background px-8 h-14 text-base rounded-full group"
-                  >
-                    Start building free
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="h-14 px-8 text-base rounded-full border-foreground/20 hover:bg-foreground/5"
-                  >
-                    Talk to sales
-                  </Button>
+                  <a href="/signup">
+                    <Button
+                      size="lg"
+                      className="bg-foreground hover:bg-foreground/90 text-background px-8 h-14 text-base rounded-full group"
+                    >
+                      Start building free
+                      <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                  </a>
+                  <a href="/workspace">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="h-14 px-8 text-base rounded-full border-foreground/20 hover:bg-foreground/5"
+                    >
+                      Launch workspace
+                    </Button>
+                  </a>
                 </div>
 
                 <p className="text-sm text-muted-foreground mt-8 font-mono">

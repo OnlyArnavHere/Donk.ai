@@ -1,0 +1,138 @@
+import { Server as SocketIOServer } from 'socket.io';
+import { verifyAccessToken } from '../utils/tokens.js';
+import { User } from '../models/User.js';
+import { env } from '../config/env.js';
+
+/**
+ * Initialize Socket.io server.
+ * Supports: streaming AI responses, typing indicators, progress updates, notifications.
+ */
+export const initSocket = (httpServer) => {
+  const io = new SocketIOServer(httpServer, {
+    cors: {
+      origin: [env.clientOrigin, env.clientOriginFallback],
+      credentials: true,
+      methods: ['GET', 'POST'],
+    },
+    pingTimeout: 60000,
+    pingInterval: 25000,
+  });
+
+  // Socket authentication middleware
+  io.use(async (socket, next) => {
+    try {
+      // Try token from handshake auth
+      let token = socket.handshake.auth?.token;
+
+      // Fall back to cookie (if passed in headers)
+      if (!token && socket.handshake.headers?.cookie) {
+        const cookies = socket.handshake.headers.cookie
+          .split(';')
+          .reduce((acc, c) => {
+            const [k, v] = c.trim().split('=');
+            acc[k] = v;
+            return acc;
+          }, {});
+        token = cookies['dunk_access'];
+      }
+
+      if (!token) {
+        return next(new Error('Authentication required'));
+      }
+
+      const payload = verifyAccessToken(token);
+      const user = await User.findById(payload.sub);
+      if (!user || !user.isActive) {
+        return next(new Error('Invalid user'));
+      }
+
+      socket.userId = user._id.toString();
+      socket.user = user;
+      next();
+    } catch {
+      next(new Error('Authentication failed'));
+    }
+  });
+
+  io.on('connection', (socket) => {
+    console.info(`[Socket] User connected: ${socket.userId}`);
+
+    // Join personal room for notifications
+    socket.join(`user:${socket.userId}`);
+
+    // Join project rooms for collaborative features
+    socket.on('project:join', (projectId) => {
+      socket.join(`project:${projectId}`);
+      socket.to(`project:${projectId}`).emit('user:joined', {
+        userId: socket.userId,
+        name: socket.user.name,
+      });
+    });
+
+    socket.on('project:leave', (projectId) => {
+      socket.leave(`project:${projectId}`);
+      socket.to(`project:${projectId}`).emit('user:left', {
+        userId: socket.userId,
+      });
+    });
+
+    // Typing indicators
+    socket.on('typing:start', ({ projectId, chatId }) => {
+      socket.to(`project:${projectId}`).emit('typing:start', {
+        userId: socket.userId,
+        name: socket.user.name,
+        chatId,
+      });
+    });
+
+    socket.on('typing:stop', ({ projectId, chatId }) => {
+      socket.to(`project:${projectId}`).emit('typing:stop', {
+        userId: socket.userId,
+        chatId,
+      });
+    });
+
+    // AI progress updates (for streaming)
+    socket.on('ai:subscribe', (jobId) => {
+      socket.join(`job:${jobId}`);
+    });
+
+    socket.on('ai:unsubscribe', (jobId) => {
+      socket.leave(`job:${jobId}`);
+    });
+
+    socket.on('disconnect', () => {
+      console.info(`[Socket] User disconnected: ${socket.userId}`);
+    });
+  });
+
+  return io;
+};
+
+/**
+ * Emit a notification to a specific user (used by services/helpers).
+ */
+export const emitToUser = (io, userId, event, data) => {
+  io.to(`user:${userId}`).emit(event, data);
+};
+
+/**
+ * Emit AI progress update to subscribers of a job.
+ */
+export const emitAIProgress = (io, jobId, data) => {
+  io.to(`job:${jobId}`).emit('ai:progress', data);
+};
+
+/**
+ * Emit AI streaming chunk to subscribers.
+ */
+export const emitAIStream = (io, jobId, chunk) => {
+  io.to(`job:${jobId}`).emit('ai:stream', { chunk, jobId });
+};
+
+/**
+ * Emit AI completion to subscribers.
+ */
+export const emitAIComplete = (io, jobId, result) => {
+  io.to(`job:${jobId}`).emit('ai:complete', { jobId, result });
+};

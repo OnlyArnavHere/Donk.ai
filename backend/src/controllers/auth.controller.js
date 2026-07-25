@@ -1,6 +1,106 @@
-import { asyncHandler } from '../utils/asyncHandler.js'; import { send } from '../utils/response.js'; import * as service from '../services/auth.service.js';
-export const register = asyncHandler(async (req,res) => send(res,{status:201,message:'Registered',data:await service.register(req.body)}));
-export const login = asyncHandler(async (req,res) => send(res,{message:'Logged in',data:await service.login(req.body)}));
-export const refresh = asyncHandler(async (req,res) => send(res,{message:'Token refreshed',data:await service.refresh(req.body.refreshToken)}));
-export const logout = asyncHandler(async (req,res) => { await service.logout(req.body.refreshToken); send(res,{message:'Logged out'}); });
-export const me = asyncHandler(async (req,res) => send(res,{data:req.user}));
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { send } from '../utils/response.js';
+import * as service from '../services/auth.service.js';
+import { setAuthCookies, clearAuthCookies, extractTokensFromCookies } from '../utils/tokens.js';
+import { env } from '../config/env.js';
+
+// Helper: set cookies if the request came from a browser (Origin header matches frontend)
+const shouldSetCookies = (req) => {
+  const origin = req.headers.origin;
+  return Boolean(origin && (origin === env.clientOrigin || origin === env.clientOriginFallback));
+};
+
+const respondWithTokens = (res, data, message, status = 200, setCookies = true) => {
+  if (setCookies) {
+    setAuthCookies(res, data.accessToken, data.refreshToken);
+  }
+  send(res, { status, message, data });
+};
+
+export const register = asyncHandler(async (req, res) => {
+  const data = await service.register(req.body, req);
+  respondWithTokens(res, data, 'Account created successfully', 201, shouldSetCookies(req));
+});
+
+export const login = asyncHandler(async (req, res) => {
+  const data = await service.login(req.body, req);
+  respondWithTokens(res, data, 'Logged in successfully', 200, shouldSetCookies(req));
+});
+
+export const refresh = asyncHandler(async (req, res) => {
+  // Accept refresh token from body OR cookie
+  const token = req.body.refreshToken || extractTokensFromCookies(req).refreshToken;
+  if (!token) {
+    return send(res, { status: 400, message: 'Refresh token is required' });
+  }
+  const data = await service.refresh(token, req);
+  respondWithTokens(res, data, 'Token refreshed successfully', 200, shouldSetCookies(req));
+});
+
+export const logout = asyncHandler(async (req, res) => {
+  const token = req.body.refreshToken || extractTokensFromCookies(req).refreshToken;
+  await service.logout(token, req);
+  clearAuthCookies(res);
+  send(res, { message: 'Logged out successfully' });
+});
+
+export const me = asyncHandler(async (req, res) => {
+  send(res, { data: service.getCurrentUser(req.user) });
+});
+
+export const updateProfile = asyncHandler(async (req, res) => {
+  const data = await service.updateProfile(req.user, req.body, req);
+  send(res, { message: 'Profile updated successfully', data });
+});
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  await service.forgotPassword(req.body.email, req);
+  send(res, {
+    message: 'If an account exists for that email, a reset link has been sent.',
+  });
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  const data = await service.resetPassword(req.body.token, req.body.password, req);
+  respondWithTokens(res, data, 'Password reset successfully', 200, shouldSetCookies(req));
+});
+
+export const changePassword = asyncHandler(async (req, res) => {
+  await service.changePassword(req.user, req.body.currentPassword, req.body.newPassword, req);
+  send(res, { message: 'Password changed successfully' });
+});
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const result = await service.verifyEmail(req.body.token);
+  send(res, { message: 'Email verified successfully', data: result });
+});
+
+export const resendVerification = asyncHandler(async (req, res) => {
+  await service.resendVerification(req.body.email);
+  send(res, { message: 'If the account exists, a new verification link has been sent.' });
+});
+
+// ---- Google OAuth ----
+
+export const googleAuth = asyncHandler(async (req, res) => {
+  const url = service.getGoogleAuthUrl();
+  res.redirect(url);
+});
+
+export const googleCallback = asyncHandler(async (req, res) => {
+  const { code, error } = req.query;
+  if (error) {
+    return res.redirect(`${env.clientOrigin}/login?error=${encodeURIComponent(error)}`);
+  }
+  if (!code) {
+    return res.redirect(`${env.clientOrigin}/login?error=no_code`);
+  }
+
+  const data = await service.handleGoogleCallback(code, req);
+  // Set cookies and redirect to frontend
+  setAuthCookies(res, data.accessToken, data.refreshToken);
+
+  // Redirect to frontend with success indicator
+  const redirectUrl = `${env.clientOrigin}/auth/callback?success=true`;
+  res.redirect(redirectUrl);
+});

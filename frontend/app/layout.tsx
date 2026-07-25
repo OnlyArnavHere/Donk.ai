@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
+import { AuthProvider } from '@/lib/auth-context'
+import { QueryProvider } from '@/lib/query-provider'
 
 export const metadata: Metadata = {
   title: 'DunkAI - Hardware Engineering Copilot',
@@ -16,10 +18,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-background">
+    <html lang="en" className="bg-background" suppressHydrationWarning>
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          {children}
+          <QueryProvider>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </QueryProvider>
         </ThemeProvider>
         <Analytics />
       </body>

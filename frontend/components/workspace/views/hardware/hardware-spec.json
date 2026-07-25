@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "name": "IoT Edge Node",
+    "revision": "rev B",
+    "description": "Battery-powered smart edge controller with BLE, environmental sensing and QSPI storage."
+  },
+  "nodes": [
+    {
+      "id": "battery",
+      "kind": "power",
+      "label": "Li-Ion Battery",
+      "part": "18650 · 3400 mAh",
+      "specs": { "rails": ["VBAT 3.7V"], "draw": "—" },
+      "position": { "x": 0, "y": 40 }
+    },
+    {
+      "id": "pmic",
+      "kind": "power",
+      "label": "PMIC",
+      "part": "BQ25895",
+      "specs": { "rails": ["+3.3V", "+1.8V", "VBAT"], "draw": "12 mW idle" },
+      "position": { "x": 0, "y": 300 }
+    },
+    {
+      "id": "mcu",
+      "kind": "mcu",
+      "label": "Wireless MCU",
+      "part": "STM32WB55",
+      "specs": { "clock": "64 MHz", "cores": 2, "arch": "Cortex-M4 + M0+" },
+      "position": { "x": 620, "y": 170 }
+    },
+    {
+      "id": "temp-sensor",
+      "kind": "sensor",
+      "label": "Temperature",
+      "part": "TMP117",
+      "specs": { "signal": "I2C", "reading": "23.4 °C" },
+      "position": { "x": 300, "y": 0 }
+    },
+    {
+      "id": "imu",
+      "kind": "sensor",
+      "label": "6-Axis IMU",
+      "part": "BMI270",
+      "specs": { "signal": "SPI", "reading": "±2g · 250°/s" },
+      "position": { "x": 300, "y": 190 }
+    },
+    {
+      "id": "tof-lidar",
+      "kind": "sensor",
+      "label": "ToF Ranger",
+      "part": "VL53L1X",
+      "specs": { "signal": "I2C", "reading": "1.24 m" },
+      "position": { "x": 300, "y": 380 }
+    },
+    {
+      "id": "qspi-flash",
+      "kind": "memory",
+      "label": "NOR Flash",
+      "part": "W25Q128JV",
+      "specs": { "busWidth": "x4 QSPI", "size": "16 MB" },
+      "position": { "x": 980, "y": 0 }
+    },
+    {
+      "id": "fram",
+      "kind": "memory",
+      "label": "FRAM",
+      "part": "MB85RC256",
+      "specs": { "busWidth": "x1 I2C", "size": "32 KB" },
+      "position": { "x": 980, "y": 190 }
+    },
+    {
+      "id": "ble-antenna",
+      "kind": "peripheral",
+      "label": "BLE Radio",
+      "part": "2.4 GHz chip antenna",
+      "specs": { "protocol": "BLE 5.3", "rf": true },
+      "position": { "x": 980, "y": 380 }
+    },
+    {
+      "id": "can-bus",
+      "kind": "peripheral",
+      "label": "CAN Transceiver",
+      "part": "TCAN1042",
+      "specs": { "protocol": "CAN FD" },
+      "position": { "x": 620, "y": 450 }
+    }
+  ],
+  "edges": [
+    { "source": "battery", "target": "pmic", "bus": "Power", "label": "VBAT" },
+    { "source": "pmic", "target": "mcu", "bus": "Power", "label": "+3.3V" },
+    { "source": "pmic", "target": "temp-sensor", "bus": "Power", "label": "+1.8V" },
+    { "source": "pmic", "target": "imu", "bus": "Power", "label": "+1.8V" },
+    { "source": "pmic", "target": "tof-lidar", "bus": "Power", "label": "+3.3V" },
+    { "source": "pmic", "target": "qspi-flash", "bus": "Power", "label": "+3.3V" },
+    { "source": "temp-sensor", "target": "mcu", "bus": "I2C", "label": "I2C1 · 400 kHz" },
+    { "source": "imu", "target": "mcu", "bus": "SPI", "label": "SPI1 · 10 MHz" },
+    { "source": "tof-lidar", "target": "mcu", "bus": "I2C", "label": "I2C1 · 400 kHz" },
+    { "source": "mcu", "target": "qspi-flash", "bus": "QSPI", "label": "QSPI · 80 MHz" },
+    { "source": "mcu", "target": "fram", "bus": "I2C", "label": "I2C2" },
+    { "source": "mcu", "target": "ble-antenna", "bus": "BLE", "label": "RF 2.4 GHz" },
+    { "source": "mcu", "target": "can-bus", "bus": "UART", "label": "CAN TX/RX" }
+  ]
+}

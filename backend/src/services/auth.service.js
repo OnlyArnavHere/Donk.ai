@@ -1,10 +1,325 @@
 import bcrypt from 'bcryptjs';
+import { env } from '../config/env.js';
 import { User } from '../models/User.js';
 import { Session } from '../models/Session.js';
+import { ActivityLog } from '../models/ActivityLog.js';
 import { ApiError } from '../utils/ApiError.js';
-import { hashToken, signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/tokens.js';
-export const register = async ({ name, email, password }) => { if (await User.findOne({ email })) throw ApiError.badRequest('Email is already registered'); const user = await User.create({ name, email, password: await bcrypt.hash(password, 12) }); return issue(user); };
-export const login = async ({ email, password }) => { const user = await User.findOne({ email }).select('+password'); if (!user || !(await bcrypt.compare(password, user.password))) throw ApiError.unauthorized('Invalid email or password'); return issue(user); };
-const issue = async (user) => { const session = await Session.create({ user: user._id, expiresAt: new Date(Date.now() + 30 * 86400000) }); const refreshToken = signRefreshToken(user, session._id); session.tokenHash = hashToken(refreshToken); await session.save(); return { user: user.toJSON(), accessToken: signAccessToken(user), refreshToken }; };
-export const refresh = async (token) => { let p; try { p = verifyRefreshToken(token); } catch { throw ApiError.unauthorized('Invalid refresh token'); } const s = await Session.findOne({ _id: p.sid, user: p.sub, tokenHash: hashToken(token), expiresAt: { $gt: new Date() } }); if (!s) throw ApiError.unauthorized('Refresh session expired'); await s.deleteOne(); return issue(await User.findById(p.sub)); };
-export const logout = async (token) => { if (token) await Session.deleteOne({ tokenHash: hashToken(token) }); };
+import {
+  hashToken,
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken,
+  generateResetToken,
+  generateVerificationToken,
+} from '../utils/tokens.js';
+
+// ---- Activity Logging Helper ----
+
+const logActivity = (action, userId = null, details = {}, req = null) =>
+  ActivityLog.create({
+    user: userId,
+    action,
+    ipAddress: req?.ip || '',
+    userAgent: req?.headers?.['user-agent'] || '',
+    details,
+  }).catch(() => {});
+
+// ---- Core: Issue tokens + create session ----
+
+const issueTokens = async (user, req = null) => {
+  // Delete any existing sessions for this user beyond a reasonable limit
+  const existingCount = await Session.countDocuments({ user: user._id });
+  if (existingCount >= 5) {
+    // Keep only the most recent 4 sessions
+    const oldSessions = await Session.find({ user: user._id })
+      .sort({ createdAt: -1 })
+      .skip(4);
+    await Session.deleteMany({ _id: { $in: oldSessions.map((s) => s._id) } });
+  }
+
+  // Create session document (not yet saved) so we have the _id for the refresh token
+  const session = new Session({
+    user: user._id,
+    expiresAt: new Date(Date.now() + 30 * 86400000),
+    userAgent: req?.headers?.['user-agent'] || '',
+    ipAddress: req?.ip || '',
+  });
+
+  const refreshToken = signRefreshToken(user, session._id);
+  session.tokenHash = hashToken(refreshToken);
+  await session.save();
+
+  return {
+    user: user.toJSON(),
+    accessToken: signAccessToken(user),
+    refreshToken,
+  };
+};
+
+// ---- Register ----
+
+export const register = async ({ name, email, password }, req = null) => {
+  const existing = await User.findOne({ email });
+  if (existing) throw ApiError.badRequest('Email is already registered');
+
+  const hashedPassword = await bcrypt.hash(password, env.bcryptRounds);
+  const { hashedToken: verificationToken } = generateVerificationToken();
+
+  const user = await User.create({
+    name,
+    email,
+    password: hashedPassword,
+    emailVerificationToken: verificationToken,
+    provider: 'local',
+  });
+
+  await logActivity('register', user._id, { method: 'local' }, req);
+  return issueTokens(user, req);
+};
+
+// ---- Login ----
+
+export const login = async ({ email, password }, req = null) => {
+  const user = await User.findOne({ email }).select('+password');
+  if (!user || !user.password) {
+    throw ApiError.unauthorized('Invalid email or password');
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw ApiError.unauthorized('Invalid email or password');
+
+  if (!user.isActive) throw ApiError.forbidden('Account is deactivated');
+
+  user.lastLogin = new Date();
+  await user.save();
+
+  await logActivity('login', user._id, { method: 'local' }, req);
+  return issueTokens(user, req);
+};
+
+// ---- Refresh Token ----
+
+export const refresh = async (token, req = null) => {
+  let payload;
+  try {
+    payload = verifyRefreshToken(token);
+  } catch {
+    throw ApiError.unauthorized('Invalid refresh token');
+  }
+
+  const session = await Session.findOne({
+    _id: payload.sid,
+    user: payload.sub,
+    tokenHash: hashToken(token),
+    expiresAt: { $gt: new Date() },
+  });
+
+  if (!session) throw ApiError.unauthorized('Refresh session expired or revoked');
+
+  // Rotate: delete old session
+  await session.deleteOne();
+
+  const user = await User.findById(payload.sub);
+  if (!user) throw ApiError.unauthorized('User not found');
+  if (!user.isActive) throw ApiError.forbidden('Account is deactivated');
+
+  return issueTokens(user, req);
+};
+
+// ---- Logout ----
+
+export const logout = async (token, req = null) => {
+  if (!token) return;
+  let payload;
+  try {
+    payload = verifyRefreshToken(token);
+  } catch {
+    return; // Invalid token, nothing to revoke
+  }
+  await Session.deleteOne({ _id: payload.sid, tokenHash: hashToken(token) });
+
+  if (payload.sub) {
+    await logActivity('logout', payload.sub, {}, req);
+  }
+};
+
+// ---- Get current user ----
+
+export const getCurrentUser = (user) => user.toJSON();
+
+// ---- Update Profile ----
+
+export const updateProfile = async (user, { name, avatar } = {}, req = null) => {
+  if (name !== undefined) user.name = name;
+  if (avatar !== undefined) user.avatar = avatar;
+  await user.save();
+
+  await logActivity('profile_updated', user._id, {}, req);
+  return user.toJSON();
+};
+
+// ---- Forgot Password ----
+
+export const forgotPassword = async (email, req = null) => {
+  const user = await User.findOne({ email });
+  // Always return success to prevent email enumeration
+  if (!user) return { sent: true };
+
+  const { rawToken, hashedToken, expires } = generateResetToken();
+  user.resetPasswordToken = hashedToken;
+  user.resetPasswordExpires = expires;
+  await user.save();
+
+  // Placeholder: In production, send email with reset link
+  // await sendEmail({ to: email, subject: 'Reset your password', html: `...${rawToken}...` })
+  console.info(`[Password Reset] Token for ${email}: ${rawToken} (expires ${expires.toISOString()})`);
+
+  await logActivity('password_reset', user._id, { requestedAt: new Date() }, req);
+  return { sent: true };
+};
+
+// ---- Reset Password ----
+
+export const resetPassword = async (token, newPassword, req = null) => {
+  const hashedToken = hashToken(token);
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: new Date() },
+  }).select('+password +resetPasswordToken +resetPasswordExpires');
+
+  if (!user) throw ApiError.badRequest('Invalid or expired reset token');
+
+  user.password = await bcrypt.hash(newPassword, env.bcryptRounds);
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  // Revoke all existing sessions (force re-login everywhere)
+  await Session.deleteMany({ user: user._id });
+
+  await logActivity('password_reset', user._id, { completedAt: new Date() }, req);
+  return issueTokens(user, req);
+};
+
+// ---- Change Password (authenticated) ----
+
+export const changePassword = async (user, currentPassword, newPassword, req = null) => {
+  const userWithPassword = await User.findById(user._id).select('+password');
+  if (!userWithPassword.password) {
+    throw ApiError.badRequest('Password change not available for OAuth accounts');
+  }
+
+  const isMatch = await bcrypt.compare(currentPassword, userWithPassword.password);
+  if (!isMatch) throw ApiError.unauthorized('Current password is incorrect');
+
+  userWithPassword.password = await bcrypt.hash(newPassword, env.bcryptRounds);
+  await userWithPassword.save();
+
+  await logActivity('password_reset', user._id, { method: 'change' }, req);
+  return { success: true };
+};
+
+// ---- Email Verification ----
+
+export const verifyEmail = async (token) => {
+  const hashedToken = hashToken(token);
+  const user = await User.findOne({ emailVerificationToken: hashedToken });
+  if (!user) throw ApiError.badRequest('Invalid verification token');
+
+  user.isVerified = true;
+  user.emailVerificationToken = undefined;
+  await user.save();
+
+  return { verified: true };
+};
+
+export const resendVerification = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) return { sent: true };
+  if (user.isVerified) throw ApiError.badRequest('Email is already verified');
+
+  const { hashedToken } = generateVerificationToken();
+  user.emailVerificationToken = hashedToken;
+  await user.save();
+
+  // Placeholder: send verification email
+  console.info(`[Email Verification] New token for ${email}: ${hashedToken}`);
+  return { sent: true };
+};
+
+// ---- Google OAuth ----
+
+export const getGoogleAuthUrl = () => {
+  const params = new URLSearchParams({
+    client_id: env.googleClientId,
+    redirect_uri: env.googleRedirectUri,
+    response_type: 'code',
+    scope: 'openid email profile',
+    access_type: 'offline',
+    prompt: 'consent',
+  });
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+};
+
+export const handleGoogleCallback = async (code, req = null) => {
+  if (!env.googleClientId || !env.googleClientSecret) {
+    throw ApiError.badRequest('Google OAuth is not configured on the server');
+  }
+
+  // Exchange code for tokens
+  const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      code,
+      client_id: env.googleClientId,
+      client_secret: env.googleClientSecret,
+      redirect_uri: env.googleRedirectUri,
+      grant_type: 'authorization_code',
+    }),
+  });
+
+  if (!tokenRes.ok) {
+    const err = await tokenRes.json().catch(() => ({}));
+    throw ApiError.unauthorized(`Google token exchange failed: ${err.error || 'unknown error'}`);
+  }
+
+  const tokenData = await tokenRes.json();
+
+  // Get user info from Google
+  const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: { authorization: `Bearer ${tokenData.access_token}` },
+  });
+
+  if (!userRes.ok) throw ApiError.unauthorized('Failed to fetch Google user info');
+
+  const googleUser = await userRes.json();
+
+  // Find or create user
+  let user = await User.findOne({ email: googleUser.email });
+  if (!user) {
+    user = await User.create({
+      name: googleUser.name || googleUser.email.split('@')[0],
+      email: googleUser.email,
+      avatar: googleUser.picture || '',
+      provider: 'google',
+      googleId: googleUser.sub,
+      isVerified: true, // Google-verified email
+    });
+  } else if (!user.googleId) {
+    // Link existing account to Google
+    user.googleId = googleUser.sub;
+    user.provider = user.provider === 'local' ? 'local' : 'google';
+    if (googleUser.picture && !user.avatar) user.avatar = googleUser.picture;
+    user.isVerified = true;
+    await user.save();
+  }
+
+  if (!user.isActive) throw ApiError.forbidden('Account is deactivated');
+
+  user.lastLogin = new Date();
+  await user.save();
+
+  await logActivity('login', user._id, { method: 'google' }, req);
+  return issueTokens(user, req);
+};

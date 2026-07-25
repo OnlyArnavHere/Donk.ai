@@ -1,2 +1,21 @@
-import { Router } from 'express'; import { body } from 'express-validator'; import * as c from '../controllers/chat.controller.js'; import { authenticate } from '../middleware/auth.js'; import { validate } from '../middleware/validation.js';
-export const chatRoutes=Router(); chatRoutes.use(authenticate); chatRoutes.post('/',[body('project').isMongoId(),validate],c.create); chatRoutes.get('/project/:projectId',c.list); chatRoutes.get('/:id/messages',c.messages); chatRoutes.post('/:id/messages',[body('content').isLength({min:1,max:50000}),validate],c.sendMessage); chatRoutes.patch('/:id',[body('title').isLength({min:1,max:160}),validate],c.rename); chatRoutes.delete('/:id',c.remove);
+import { Router } from 'express';
+import * as c from '../controllers/chat.controller.js';
+import { authenticate } from '../middleware/auth.js';
+import { validate } from '../middleware/validation.js';
+import {
+  createChatValidation,
+  sendMessageValidation,
+  renameChatValidation,
+} from '../validators/chat.validators.js';
+
+export const chatRoutes = Router();
+
+chatRoutes.use(authenticate);
+
+chatRoutes.post('/', createChatValidation, validate, c.create);
+chatRoutes.get('/project/:projectId', c.list);
+chatRoutes.get('/:id/messages', c.messages);
+chatRoutes.post('/:id/messages', sendMessageValidation, validate, c.sendMessage);
+chatRoutes.patch('/:id', renameChatValidation, validate, c.rename);
+chatRoutes.post('/:id/pin', c.togglePin);
+chatRoutes.delete('/:id', c.remove);

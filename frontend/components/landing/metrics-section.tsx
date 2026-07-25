@@ -72,11 +72,14 @@ const metrics = [
 ];
 
 export function MetricsSection() {
-  const [time, setTime] = useState(new Date());
+  // Clock is client-only — rendering a locale time string on the server
+  // causes a hydration mismatch, so keep it null until mounted
+  const [time, setTime] = useState<Date | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    setTime(new Date());
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
@@ -119,7 +122,7 @@ export function MetricsSection() {
               Live
             </span>
             <span className="text-foreground/30">|</span>
-            <span>{time.toLocaleTimeString()}</span>
+            <span suppressHydrationWarning>{time ? time.toLocaleTimeString() : "--:--:--"}</span>
           </div>
         </div>
         

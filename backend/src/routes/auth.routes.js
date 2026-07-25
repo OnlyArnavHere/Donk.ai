@@ -1,2 +1,36 @@
-import { Router } from 'express'; import { body } from 'express-validator'; import * as c from '../controllers/auth.controller.js'; import { validate } from '../middleware/validation.js'; import { authenticate } from '../middleware/auth.js';
-export const authRoutes=Router(); const credentials=[body('email').isEmail().normalizeEmail(),body('password').isLength({min:8})]; authRoutes.post('/register',[body('name').isLength({min:2}),...credentials,validate],c.register); authRoutes.post('/login',[...credentials,validate],c.login); authRoutes.post('/refresh',[body('refreshToken').notEmpty(),validate],c.refresh); authRoutes.post('/logout',c.logout); authRoutes.get('/me',authenticate,c.me);
+import { Router } from 'express';
+import * as c from '../controllers/auth.controller.js';
+import { validate } from '../middleware/validation.js';
+import { authenticate } from '../middleware/auth.js';
+import {
+  registerValidation,
+  loginValidation,
+  refreshValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
+  changePasswordValidation,
+  verifyEmailValidation,
+  resendVerificationValidation,
+  updateProfileValidation,
+} from '../validators/auth.validators.js';
+
+export const authRoutes = Router();
+
+// Public routes
+authRoutes.post('/register', registerValidation, validate, c.register);
+authRoutes.post('/login', loginValidation, validate, c.login);
+authRoutes.post('/refresh', refreshValidation, validate, c.refresh);
+authRoutes.post('/logout', c.logout);
+authRoutes.post('/forgot-password', forgotPasswordValidation, validate, c.forgotPassword);
+authRoutes.post('/reset-password', resetPasswordValidation, validate, c.resetPassword);
+authRoutes.post('/verify-email', verifyEmailValidation, validate, c.verifyEmail);
+authRoutes.post('/resend-verification', resendVerificationValidation, validate, c.resendVerification);
+
+// Google OAuth
+authRoutes.get('/google', c.googleAuth);
+authRoutes.get('/google/callback', c.googleCallback);
+
+// Protected routes
+authRoutes.get('/me', authenticate, c.me);
+authRoutes.put('/profile', authenticate, updateProfileValidation, validate, c.updateProfile);
+authRoutes.put('/password', authenticate, changePasswordValidation, validate, c.changePassword);

@@ -71,6 +71,10 @@ export function AnimatedTetrahedron() {
       const rect = canvas.getBoundingClientRect();
       ctx.clearRect(0, 0, rect.width, rect.height);
 
+      // Resolve the theme foreground color each frame so the shape
+      // stays visible in both light and dark mode
+      const ink = getComputedStyle(canvas).color;
+
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
       const scale = Math.min(rect.width, rect.height) * 0.7;
@@ -147,11 +151,13 @@ export function AnimatedTetrahedron() {
       points.sort((a, b) => a.z - b.z);
 
       // Draw points
+      ctx.fillStyle = ink;
       points.forEach((point) => {
         const alpha = 0.15 + (point.z + 1.5) * 0.25;
-        ctx.fillStyle = `rgba(0, 0, 0, ${Math.min(alpha, 0.9)})`;
+        ctx.globalAlpha = Math.min(alpha, 0.9);
         ctx.fillText(point.char, point.x, point.y);
       });
+      ctx.globalAlpha = 1;
 
       time += 0.015;
       frameRef.current = requestAnimationFrame(render);
@@ -168,7 +174,7 @@ export function AnimatedTetrahedron() {
   return (
     <canvas
       ref={canvasRef}
-      className="w-full h-full"
+      className="w-full h-full text-foreground"
       style={{ display: "block" }}
     />
   );

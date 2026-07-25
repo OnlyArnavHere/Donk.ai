@@ -41,6 +41,10 @@ export  function AnimatedSphere() {
       const width = rect.width;
       const height = rect.height;
 
+      // Resolve the theme foreground color each frame so the ASCII art
+      // stays visible in both light and dark mode
+      const ink = getComputedStyle(canvas).color;
+
       // Clear frame
       ctx.clearRect(0, 0, width, height);
 
@@ -205,16 +209,18 @@ export  function AnimatedSphere() {
       ctx.textBaseline = "middle";
 
       points.forEach((p) => {
+        ctx.fillStyle = ink;
         if (p.glow) {
-          ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
-          ctx.shadowColor = "#ffffff";
+          ctx.globalAlpha = Math.min(1, p.alpha);
+          ctx.shadowColor = ink;
           ctx.shadowBlur = 8;
         } else {
-          ctx.fillStyle = `rgba(240, 240, 240, ${Math.min(1, Math.max(0.05, p.alpha))})`;
+          ctx.globalAlpha = Math.min(1, Math.max(0.05, p.alpha));
           ctx.shadowBlur = 0;
         }
         ctx.fillText(p.char, p.x, p.y);
       });
+      ctx.globalAlpha = 1;
 
       time += 0.025;
       animationFrameRef.current = requestAnimationFrame(render);
@@ -244,7 +250,7 @@ export  function AnimatedSphere() {
       <canvas
         ref={canvasRef}
         onMouseMove={handleMouseMove}
-        className="w-full h-full block cursor-default"
+        className="w-full h-full block cursor-default text-foreground"
       />
     </div>
   );

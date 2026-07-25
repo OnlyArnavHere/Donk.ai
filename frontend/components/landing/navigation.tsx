@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
+// Anchors must match section ids actually rendered on the landing page
 const navLinks = [
   { name: "Features", href: "#features" },
   { name: "How it works", href: "#how-it-works" },
-  { name: "Developers", href: "#developers" },
+  { name: "Metrics", href: "#studio" },
   { name: "Pricing", href: "#pricing" },
 ];
 
@@ -146,14 +147,14 @@ export function Navigation() {
               </Button>
             </a>
             <a 
-              href="/workspace"
+              href="/signup"
               className="flex-1"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <Button 
                 className="flex-1 bg-foreground text-background rounded-full h-14 text-base"
               >
-                Try Workspace
+                Sign up free
               </Button>
             </a>
           </div>

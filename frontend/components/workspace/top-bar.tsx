@@ -1,82 +1,150 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Share2, 
-  GitBranch, 
-  Users, 
-  MoreVertical, 
-  Search,
+import React, { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { Button } from '@/components/ui/button'
+import {
+  Share2,
+  GitBranch,
+  Bell,
   Settings,
-  Bell
-} from 'lucide-react';
+  MoreVertical,
+} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu'
+import { useWorkspaceStore } from '@/lib/store'
+import { useProjects } from '@/hooks/use-projects'
+import { useUnreadCount } from '@/hooks/use-notifications'
+import { UserMenu } from './user-menu'
+import { NotificationsModal } from './notifications-modal'
+import { toast } from 'sonner'
 
-interface TopBarProps {
-  activeProject: string;
-}
+export function TopBar() {
+  const { activeProjectId } = useWorkspaceStore()
+  const { data } = useProjects()
+  const { data: unread } = useUnreadCount()
+  const router = useRouter()
+  const [showNotifications, setShowNotifications] = useState(false)
 
-export function TopBar({ activeProject }: TopBarProps) {
-  const projectNames: Record<string, string> = {
-    'smart-iot-sensor': 'Smart IoT Sensor Hub',
-    'power-management': 'Power Management Module',
-    'wireless-module': 'Wireless Communication Module',
-  };
+  const projects = data?.items || []
+  const activeProject = projects.find((p) => p._id === activeProjectId)
+  const unreadCount = unread?.count || 0
+
+  const handleAction = (action: string) => {
+    toast.info(`${action} — coming soon`)
+  }
 
   return (
     <div className="h-16 border-b border-foreground/10 bg-gradient-to-r from-background/50 to-background/30 backdrop-blur-xl flex items-center justify-between px-8 gap-6 transition-all duration-500">
-      {/* Left: Logo */}
-      <div className="flex items-center gap-2">
-        <p className="text-sm font-display tracking-tight">DunkAI</p>
+      {/* Left: Logo + Project Name */}
+      <div className="flex items-center gap-3 min-w-0">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <span className="font-display text-lg tracking-tight">DunkAI</span>
+          <span className="font-mono text-[9px] tracking-wide text-muted-foreground mt-0.5">COPILOT</span>
+        </Link>
+        {activeProject && (
+          <>
+            <span className="text-muted-foreground/30">/</span>
+            <span className="text-sm text-muted-foreground truncate">{activeProject.title}</span>
+          </>
+        )}
       </div>
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2 ml-auto">
         <ThemeToggle />
+
         {/* Share */}
-        <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => handleAction('Share')}
+          className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90"
+        >
           <Share2 className="w-4 h-4" />
         </Button>
 
         {/* Git */}
-        <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => handleAction('Git')}
+          className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90"
+        >
           <GitBranch className="w-4 h-4" />
         </Button>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setShowNotifications(true)}
+          className="relative h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90"
+        >
           <Bell className="w-4 h-4" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-semibold text-background">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
         </Button>
 
         {/* Settings */}
-        <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.push('/settings')}
+          className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90"
+        >
           <Settings className="w-4 h-4" />
         </Button>
 
-        {/* Menu */}
+        {/* Project Actions Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-background/40 transition-all duration-300 active:scale-90"
+            >
               <MoreVertical className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-xl border border-foreground/10">
-            <DropdownMenuItem className="text-sm cursor-pointer hover:bg-background/50 transition-colors">Export Design</DropdownMenuItem>
-            <DropdownMenuItem className="text-sm cursor-pointer hover:bg-background/50 transition-colors">View History</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleAction('Export Design')}
+              className="text-sm cursor-pointer hover:bg-background/50 transition-colors"
+            >
+              Export Design
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleAction('View History')}
+              className="text-sm cursor-pointer hover:bg-background/50 transition-colors"
+            >
+              View History
+            </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-foreground/10" />
-            <DropdownMenuItem className="text-sm cursor-pointer text-destructive hover:bg-destructive/10 transition-colors">Archive Project</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleAction('Archive Project')}
+              className="text-sm cursor-pointer text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              Archive Project
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* User Menu */}
+        <UserMenu />
       </div>
+
+      <NotificationsModal open={showNotifications} onOpenChange={setShowNotifications} />
     </div>
-  );
+  )
 }
