@@ -1,14 +1,17 @@
 {
-  "overall_score": 5,
+  "overall_score": 4,
   "relevance_score": 5,
-  "groundedness_score": 5,
+  "groundedness_score": 4,
   "graph_quality_score": 5,
   "verdict": "PASS",
   "strengths": [
     "Complete architecture",
-    "Relevant technology-level architecture",
-    "Vendor-neutral"
+    "Relevant technology-level architecture"
   ],
-  "weaknesses": [],
-  "warnings": []
+  "weaknesses": [
+    "Missing edge processing on a dedicated AI chip"
+  ],
+  "warnings": [
+    "Assumes Wireless MCU can handle edge processing"
+  ]
 }

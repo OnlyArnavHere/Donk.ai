@@ -1,25 +1,25 @@
 {
   "architecture_model": {
-    "processing_unit": "MCU",
+    "processing_unit": "Wireless MCU",
     "communication_modules": [
       "Wi-Fi"
     ],
     "sensing_modules": [
-      "temperature sensor",
-      "humidity sensor",
-      "wind speed sensor",
-      "air quality sensor"
+      "Gesture"
     ],
     "user_interface_modules": [
-      "Display"
+      "Audio Output"
     ],
     "power_subsystem": [
       "Battery",
       "Power Management"
     ],
-    "storage_modules": [],
+    "storage_modules": [
+      "Flash Storage"
+    ],
     "interfaces": [
-      "I2C",
+      "Audio",
+      "GPIO",
       "Power",
       "SPI",
       "WiFi"
@@ -28,10 +28,10 @@
   "architecture_graph": {
     "nodes": [
       {
-        "id": "mcu",
+        "id": "wireless-mcu",
         "type": "architecture",
         "data": {
-          "label": "MCU",
+          "label": "Wireless MCU",
           "category": "Processing",
           "inferred": true,
           "sourceRequirements": [
@@ -47,7 +47,7 @@
           "category": "Power",
           "inferred": true,
           "sourceRequirements": [
-            "['medium power', 'daily charging']"
+            "['Battery life: 24 hours']"
           ]
         }
       },
@@ -59,67 +59,31 @@
           "category": "Power",
           "inferred": true,
           "sourceRequirements": [
-            "['medium power', 'daily charging']"
+            "['Battery life: 24 hours']"
           ]
         }
       },
       {
-        "id": "temperature-sensor",
+        "id": "gesture",
         "type": "architecture",
         "data": {
-          "label": "temperature sensor",
+          "label": "Gesture",
           "category": "Input",
           "inferred": false,
           "sourceRequirements": [
-            "temperature sensor"
+            "Gesture"
           ]
         }
       },
       {
-        "id": "humidity-sensor",
+        "id": "audio-output",
         "type": "architecture",
         "data": {
-          "label": "humidity sensor",
-          "category": "Input",
-          "inferred": false,
-          "sourceRequirements": [
-            "humidity sensor"
-          ]
-        }
-      },
-      {
-        "id": "wind-speed-sensor",
-        "type": "architecture",
-        "data": {
-          "label": "wind speed sensor",
-          "category": "Input",
-          "inferred": false,
-          "sourceRequirements": [
-            "wind speed sensor"
-          ]
-        }
-      },
-      {
-        "id": "air-quality-sensor",
-        "type": "architecture",
-        "data": {
-          "label": "air quality sensor",
-          "category": "Input",
-          "inferred": false,
-          "sourceRequirements": [
-            "air quality sensor"
-          ]
-        }
-      },
-      {
-        "id": "display",
-        "type": "architecture",
-        "data": {
-          "label": "Display",
+          "label": "Audio Output",
           "category": "Output",
           "inferred": false,
           "sourceRequirements": [
-            "touchscreen display"
+            "Audio"
           ]
         }
       },
@@ -133,6 +97,16 @@
           "sourceRequirements": [
             "Wi-Fi"
           ]
+        }
+      },
+      {
+        "id": "flash-storage",
+        "type": "architecture",
+        "data": {
+          "label": "Flash Storage",
+          "category": "Storage",
+          "inferred": true,
+          "sourceRequirements": []
         }
       }
     ],
@@ -152,9 +126,9 @@
         }
       },
       {
-        "id": "power-management-power-mcu",
+        "id": "power-management-power-wireless-mcu",
         "source": "power-management",
-        "target": "mcu",
+        "target": "wireless-mcu",
         "type": "smoothstep",
         "label": "Power",
         "data": {
@@ -166,8 +140,8 @@
         }
       },
       {
-        "id": "mcu-wifi-wi-fi",
-        "source": "mcu",
+        "id": "wireless-mcu-wifi-wi-fi",
+        "source": "wireless-mcu",
         "target": "wi-fi",
         "type": "smoothstep",
         "label": "WiFi",
@@ -180,65 +154,9 @@
         }
       },
       {
-        "id": "temperature-sensor-i2c-mcu",
-        "source": "temperature-sensor",
-        "target": "mcu",
-        "type": "smoothstep",
-        "label": "I2C",
-        "data": {
-          "interface": "I2C",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "humidity-sensor-i2c-mcu",
-        "source": "humidity-sensor",
-        "target": "mcu",
-        "type": "smoothstep",
-        "label": "I2C",
-        "data": {
-          "interface": "I2C",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "wind-speed-sensor-i2c-mcu",
-        "source": "wind-speed-sensor",
-        "target": "mcu",
-        "type": "smoothstep",
-        "label": "I2C",
-        "data": {
-          "interface": "I2C",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "air-quality-sensor-i2c-mcu",
-        "source": "air-quality-sensor",
-        "target": "mcu",
-        "type": "smoothstep",
-        "label": "I2C",
-        "data": {
-          "interface": "I2C",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "mcu-spi-display",
-        "source": "mcu",
-        "target": "display",
+        "id": "wireless-mcu-spi-flash-storage",
+        "source": "wireless-mcu",
+        "target": "flash-storage",
         "type": "smoothstep",
         "label": "SPI",
         "data": {
@@ -250,9 +168,37 @@
         }
       },
       {
-        "id": "power-management-power-temperature-sensor",
+        "id": "gesture-gpio-wireless-mcu",
+        "source": "gesture",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "GPIO",
+        "data": {
+          "interface": "GPIO",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-audio-audio-output",
+        "source": "wireless-mcu",
+        "target": "audio-output",
+        "type": "smoothstep",
+        "label": "Audio",
+        "data": {
+          "interface": "Audio",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-gesture",
         "source": "power-management",
-        "target": "temperature-sensor",
+        "target": "gesture",
         "type": "smoothstep",
         "label": "Power",
         "data": {
@@ -264,51 +210,9 @@
         }
       },
       {
-        "id": "power-management-power-humidity-sensor",
+        "id": "power-management-power-audio-output",
         "source": "power-management",
-        "target": "humidity-sensor",
-        "type": "smoothstep",
-        "label": "Power",
-        "data": {
-          "interface": "Power",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "power-management-power-wind-speed-sensor",
-        "source": "power-management",
-        "target": "wind-speed-sensor",
-        "type": "smoothstep",
-        "label": "Power",
-        "data": {
-          "interface": "Power",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "power-management-power-air-quality-sensor",
-        "source": "power-management",
-        "target": "air-quality-sensor",
-        "type": "smoothstep",
-        "label": "Power",
-        "data": {
-          "interface": "Power",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "power-management-power-display",
-        "source": "power-management",
-        "target": "display",
+        "target": "audio-output",
         "type": "smoothstep",
         "label": "Power",
         "data": {
@@ -336,22 +240,23 @@
     ]
   },
   "architecture_notes": [
-    "MCU acts as the central processing unit.",
+    "Wireless MCU acts as the central processing unit.",
     "The graph represents logical subsystem relationships; exact components are intentionally deferred."
   ],
   "assumptions": [
-    "MCU is an inferred, technology-level subsystem from: Wi-Fi; exact components remain unspecified.",
-    "Battery is an inferred, technology-level subsystem from: ['medium power', 'daily charging']; exact components remain unspecified.",
-    "Power Management is an inferred, technology-level subsystem from: ['medium power', 'daily charging']; exact components remain unspecified."
+    "Wireless MCU is an inferred, technology-level subsystem from: Wi-Fi; exact components remain unspecified.",
+    "Battery is an inferred, technology-level subsystem from: ['Battery life: 24 hours']; exact components remain unspecified.",
+    "Power Management is an inferred, technology-level subsystem from: ['Battery life: 24 hours']; exact components remain unspecified.",
+    "Flash Storage is an inferred, technology-level subsystem; exact components remain unspecified."
   ],
   "warnings": [],
   "react_flow": {
     "nodes": [
       {
-        "id": "mcu",
+        "id": "wireless-mcu",
         "type": "architecture",
         "data": {
-          "label": "MCU",
+          "label": "Wireless MCU",
           "category": "Processing",
           "inferred": true,
           "sourceRequirements": [
@@ -371,7 +276,7 @@
           "category": "Power",
           "inferred": true,
           "sourceRequirements": [
-            "['medium power', 'daily charging']"
+            "['Battery life: 24 hours']"
           ]
         },
         "position": {
@@ -387,7 +292,7 @@
           "category": "Power",
           "inferred": true,
           "sourceRequirements": [
-            "['medium power', 'daily charging']"
+            "['Battery life: 24 hours']"
           ]
         },
         "position": {
@@ -396,14 +301,14 @@
         }
       },
       {
-        "id": "temperature-sensor",
+        "id": "gesture",
         "type": "architecture",
         "data": {
-          "label": "temperature sensor",
+          "label": "Gesture",
           "category": "Input",
           "inferred": false,
           "sourceRequirements": [
-            "temperature sensor"
+            "Gesture"
           ]
         },
         "position": {
@@ -412,62 +317,14 @@
         }
       },
       {
-        "id": "humidity-sensor",
+        "id": "audio-output",
         "type": "architecture",
         "data": {
-          "label": "humidity sensor",
-          "category": "Input",
-          "inferred": false,
-          "sourceRequirements": [
-            "humidity sensor"
-          ]
-        },
-        "position": {
-          "x": 320,
-          "y": 160
-        }
-      },
-      {
-        "id": "wind-speed-sensor",
-        "type": "architecture",
-        "data": {
-          "label": "wind speed sensor",
-          "category": "Input",
-          "inferred": false,
-          "sourceRequirements": [
-            "wind speed sensor"
-          ]
-        },
-        "position": {
-          "x": 320,
-          "y": 320
-        }
-      },
-      {
-        "id": "air-quality-sensor",
-        "type": "architecture",
-        "data": {
-          "label": "air quality sensor",
-          "category": "Input",
-          "inferred": false,
-          "sourceRequirements": [
-            "air quality sensor"
-          ]
-        },
-        "position": {
-          "x": 320,
-          "y": 480
-        }
-      },
-      {
-        "id": "display",
-        "type": "architecture",
-        "data": {
-          "label": "Display",
+          "label": "Audio Output",
           "category": "Output",
           "inferred": false,
           "sourceRequirements": [
-            "touchscreen display"
+            "Audio"
           ]
         },
         "position": {
@@ -490,6 +347,20 @@
           "x": 960,
           "y": 0
         }
+      },
+      {
+        "id": "flash-storage",
+        "type": "architecture",
+        "data": {
+          "label": "Flash Storage",
+          "category": "Storage",
+          "inferred": true,
+          "sourceRequirements": []
+        },
+        "position": {
+          "x": 960,
+          "y": 160
+        }
       }
     ],
     "edges": [
@@ -508,9 +379,9 @@
         }
       },
       {
-        "id": "power-management-power-mcu",
+        "id": "power-management-power-wireless-mcu",
         "source": "power-management",
-        "target": "mcu",
+        "target": "wireless-mcu",
         "type": "smoothstep",
         "label": "Power",
         "data": {
@@ -522,8 +393,8 @@
         }
       },
       {
-        "id": "mcu-wifi-wi-fi",
-        "source": "mcu",
+        "id": "wireless-mcu-wifi-wi-fi",
+        "source": "wireless-mcu",
         "target": "wi-fi",
         "type": "smoothstep",
         "label": "WiFi",
@@ -536,65 +407,9 @@
         }
       },
       {
-        "id": "temperature-sensor-i2c-mcu",
-        "source": "temperature-sensor",
-        "target": "mcu",
-        "type": "smoothstep",
-        "label": "I2C",
-        "data": {
-          "interface": "I2C",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "humidity-sensor-i2c-mcu",
-        "source": "humidity-sensor",
-        "target": "mcu",
-        "type": "smoothstep",
-        "label": "I2C",
-        "data": {
-          "interface": "I2C",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "wind-speed-sensor-i2c-mcu",
-        "source": "wind-speed-sensor",
-        "target": "mcu",
-        "type": "smoothstep",
-        "label": "I2C",
-        "data": {
-          "interface": "I2C",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "air-quality-sensor-i2c-mcu",
-        "source": "air-quality-sensor",
-        "target": "mcu",
-        "type": "smoothstep",
-        "label": "I2C",
-        "data": {
-          "interface": "I2C",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "mcu-spi-display",
-        "source": "mcu",
-        "target": "display",
+        "id": "wireless-mcu-spi-flash-storage",
+        "source": "wireless-mcu",
+        "target": "flash-storage",
         "type": "smoothstep",
         "label": "SPI",
         "data": {
@@ -606,9 +421,37 @@
         }
       },
       {
-        "id": "power-management-power-temperature-sensor",
+        "id": "gesture-gpio-wireless-mcu",
+        "source": "gesture",
+        "target": "wireless-mcu",
+        "type": "smoothstep",
+        "label": "GPIO",
+        "data": {
+          "interface": "GPIO",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "wireless-mcu-audio-audio-output",
+        "source": "wireless-mcu",
+        "target": "audio-output",
+        "type": "smoothstep",
+        "label": "Audio",
+        "data": {
+          "interface": "Audio",
+          "inferred": true
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "power-management-power-gesture",
         "source": "power-management",
-        "target": "temperature-sensor",
+        "target": "gesture",
         "type": "smoothstep",
         "label": "Power",
         "data": {
@@ -620,51 +463,9 @@
         }
       },
       {
-        "id": "power-management-power-humidity-sensor",
+        "id": "power-management-power-audio-output",
         "source": "power-management",
-        "target": "humidity-sensor",
-        "type": "smoothstep",
-        "label": "Power",
-        "data": {
-          "interface": "Power",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "power-management-power-wind-speed-sensor",
-        "source": "power-management",
-        "target": "wind-speed-sensor",
-        "type": "smoothstep",
-        "label": "Power",
-        "data": {
-          "interface": "Power",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "power-management-power-air-quality-sensor",
-        "source": "power-management",
-        "target": "air-quality-sensor",
-        "type": "smoothstep",
-        "label": "Power",
-        "data": {
-          "interface": "Power",
-          "inferred": true
-        },
-        "markerEnd": {
-          "type": "arrowclosed"
-        }
-      },
-      {
-        "id": "power-management-power-display",
-        "source": "power-management",
-        "target": "display",
+        "target": "audio-output",
         "type": "smoothstep",
         "label": "Power",
         "data": {

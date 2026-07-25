@@ -1,42 +1,38 @@
 {
-  "project_name": "Smart Weather System",
-  "category": "Environmental Monitoring",
-  "objective": "Comprehensive weather monitoring",
+  "project_name": "Smart Glasses",
+  "category": "Wearable device",
+  "objective": "Fitness tracking and gesture input",
   "target_users": [
-    "general public"
+    "Fitness enthusiasts"
   ],
   "functional_requirements": [
-    "temperature monitoring",
-    "humidity monitoring",
-    "wind speed monitoring",
-    "air quality monitoring"
+    "Fitness tracking",
+    "Gesture input"
   ],
   "hardware_inputs": [
-    "temperature sensor",
-    "humidity sensor",
-    "wind speed sensor",
-    "air quality sensor"
+    "Gesture"
   ],
   "hardware_outputs": [
-    "touchscreen display"
+    "Audio"
   ],
   "connectivity": [
     "Wi-Fi"
   ],
   "supported_platforms": [
-    "Android"
+    "Android",
+    "iOS",
+    "Desktop"
   ],
-  "power_requirements": "['medium power', 'daily charging']",
+  "power_requirements": "['Battery life: 24 hours']",
   "physical_constraints": [
-    "durability",
-    "protection from extreme weather conditions"
+    "Weight: minimal",
+    "Water resistance: IP67"
   ],
   "performance_requirements": [
-    "medium power consumption",
-    "daily charging"
+    "Edge processing on a dedicated AI chip"
   ],
   "safety_compliance": [
-    "industry-specific safety regulations"
-  ],
-  "budget": "500-1000"
+    "Eye protection",
+    "Secure data storage"
+  ]
 }
