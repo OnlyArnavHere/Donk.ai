@@ -114,7 +114,7 @@ export function ChatInterface({ projectId }: { projectId: string }) {
   if (!messages.length && !loading) {
     return (
       <div className="relative flex h-full flex-col items-center justify-center overflow-hidden px-4 pb-20">
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[300px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/[0.07] blur-[90px]" />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[200px] w-[900px] -translate-x-1/2  -translate-y-1/2 rounded-full bg-foregroundd/[0.07] blur-[90px]" />
         <div className="relative z-10 mb-8 flex max-w-[720px] flex-col items-center text-center">
           <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl border border-border bg-secondary/90">
             <Sparkles className="h-4 w-4 text-muted-foreground" />

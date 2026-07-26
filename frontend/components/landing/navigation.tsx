@@ -43,7 +43,7 @@ export function Navigation() {
         <div 
           className={`flex items-center justify-between transition-all duration-500 px-6 lg:px-8 ${
             isScrolled ? "h-14" : "h-20"
-          }`}
+          }`} 
         >
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 group">
