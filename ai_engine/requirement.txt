@@ -1,0 +1,23 @@
+# Core ML / embeddings
+torch>=2.2.0
+sentence-transformers>=3.0.0
+
+# Hugging Face Hub (dataset access)
+huggingface_hub>=0.24.0
+
+# Vector search
+faiss-cpu>=1.8.0
+
+# Data handling
+pandas>=2.2.0
+numpy>=1.26.0
+pyarrow>=16.0.0
+
+# HTTP (in-memory fetch from HF)
+requests>=2.31.0
+
+# Env var loading
+python-dotenv>=1.0.0
+
+# UI
+gradio>=4.44.0
