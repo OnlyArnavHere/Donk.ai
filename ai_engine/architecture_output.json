@@ -1,237 +1,271 @@
 {
   "architecture_model": {
-    "processing_unit": "Wireless MCU",
+    "processing_unit": "MCU",
     "communication_modules": [
-      "Wi-Fi"
+      "Bluetooth Module",
+      "Cloud Connectivity Module"
     ],
     "sensing_modules": [
-      "Gesture"
+      "Water Quality Sensor",
+      "Flow Sensor",
+      "Temperature Sensor",
+      "User Interface"
     ],
     "user_interface_modules": [
-      "Audio Output"
+      "UV Controller",
+      "Motor Driver"
     ],
     "power_subsystem": [
-      "Battery",
-      "Power Management"
+      "Power Management",
+      "Battery"
     ],
-    "storage_modules": [
-      "Flash Storage"
-    ],
+    "storage_modules": [],
     "interfaces": [
-      "Audio",
       "GPIO",
+      "I2C",
       "Power",
       "SPI",
-      "WiFi"
+      "UART"
     ]
   },
   "architecture_graph": {
     "nodes": [
       {
-        "id": "wireless-mcu",
+        "id": "1",
         "type": "architecture",
         "data": {
-          "label": "Wireless MCU",
-          "category": "Processing",
-          "inferred": true,
-          "sourceRequirements": [
-            "Wi-Fi"
-          ]
+          "label": "MCU",
+          "category": "Processing"
         }
       },
       {
-        "id": "battery",
+        "id": "2",
         "type": "architecture",
         "data": {
-          "label": "Battery",
-          "category": "Power",
-          "inferred": true,
-          "sourceRequirements": [
-            "['Battery life: 24 hours']"
-          ]
+          "label": "Bluetooth Module",
+          "category": "Communication"
         }
       },
       {
-        "id": "power-management",
+        "id": "3",
         "type": "architecture",
         "data": {
           "label": "Power Management",
-          "category": "Power",
-          "inferred": true,
-          "sourceRequirements": [
-            "['Battery life: 24 hours']"
-          ]
+          "category": "Power"
         }
       },
       {
-        "id": "gesture",
+        "id": "4",
         "type": "architecture",
         "data": {
-          "label": "Gesture",
-          "category": "Input",
-          "inferred": false,
-          "sourceRequirements": [
-            "Gesture"
-          ]
+          "label": "Battery",
+          "category": "Power"
         }
       },
       {
-        "id": "audio-output",
+        "id": "5",
         "type": "architecture",
         "data": {
-          "label": "Audio Output",
-          "category": "Output",
-          "inferred": false,
-          "sourceRequirements": [
-            "Audio"
-          ]
+          "label": "UV Controller",
+          "category": "Output"
         }
       },
       {
-        "id": "wi-fi",
+        "id": "6",
         "type": "architecture",
         "data": {
-          "label": "Wi-Fi",
-          "category": "Communication",
-          "inferred": false,
-          "sourceRequirements": [
-            "Wi-Fi"
-          ]
+          "label": "Motor Driver",
+          "category": "Output"
         }
       },
       {
-        "id": "flash-storage",
+        "id": "7",
         "type": "architecture",
         "data": {
-          "label": "Flash Storage",
-          "category": "Storage",
-          "inferred": true,
-          "sourceRequirements": []
+          "label": "Water Quality Sensor",
+          "category": "Sensor"
+        }
+      },
+      {
+        "id": "8",
+        "type": "architecture",
+        "data": {
+          "label": "Flow Sensor",
+          "category": "Sensor"
+        }
+      },
+      {
+        "id": "9",
+        "type": "architecture",
+        "data": {
+          "label": "Temperature Sensor",
+          "category": "Sensor"
+        }
+      },
+      {
+        "id": "10",
+        "type": "architecture",
+        "data": {
+          "label": "Cloud Connectivity Module",
+          "category": "Communication"
+        }
+      },
+      {
+        "id": "11",
+        "type": "architecture",
+        "data": {
+          "label": "User Interface",
+          "category": "Input"
+        }
+      },
+      {
+        "id": "12",
+        "type": "architecture",
+        "data": {
+          "label": "Memory",
+          "category": "Memory"
         }
       }
     ],
     "edges": [
       {
-        "id": "battery-power-power-management",
-        "source": "battery",
-        "target": "power-management",
+        "id": "1-power-3",
+        "source": "1",
+        "target": "3",
         "type": "smoothstep",
         "label": "Power",
         "data": {
-          "interface": "Power",
-          "inferred": true
+          "interface": "Power"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "power-management-power-wireless-mcu",
-        "source": "power-management",
-        "target": "wireless-mcu",
+        "id": "4-power-3",
+        "source": "4",
+        "target": "3",
         "type": "smoothstep",
         "label": "Power",
         "data": {
-          "interface": "Power",
-          "inferred": true
+          "interface": "Power"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "wireless-mcu-wifi-wi-fi",
-        "source": "wireless-mcu",
-        "target": "wi-fi",
+        "id": "2-uart-1",
+        "source": "2",
+        "target": "1",
         "type": "smoothstep",
-        "label": "WiFi",
+        "label": "UART",
         "data": {
-          "interface": "WiFi",
-          "inferred": true
+          "interface": "UART"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "wireless-mcu-spi-flash-storage",
-        "source": "wireless-mcu",
-        "target": "flash-storage",
+        "id": "10-uart-1",
+        "source": "10",
+        "target": "1",
         "type": "smoothstep",
-        "label": "SPI",
+        "label": "UART",
         "data": {
-          "interface": "SPI",
-          "inferred": true
+          "interface": "UART"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "gesture-gpio-wireless-mcu",
-        "source": "gesture",
-        "target": "wireless-mcu",
+        "id": "5-gpio-1",
+        "source": "5",
+        "target": "1",
         "type": "smoothstep",
         "label": "GPIO",
         "data": {
-          "interface": "GPIO",
-          "inferred": true
+          "interface": "GPIO"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "wireless-mcu-audio-audio-output",
-        "source": "wireless-mcu",
-        "target": "audio-output",
+        "id": "6-gpio-1",
+        "source": "6",
+        "target": "1",
         "type": "smoothstep",
-        "label": "Audio",
+        "label": "GPIO",
         "data": {
-          "interface": "Audio",
-          "inferred": true
+          "interface": "GPIO"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "power-management-power-gesture",
-        "source": "power-management",
-        "target": "gesture",
+        "id": "7-i2c-1",
+        "source": "7",
+        "target": "1",
         "type": "smoothstep",
-        "label": "Power",
+        "label": "I2C",
         "data": {
-          "interface": "Power",
-          "inferred": true
+          "interface": "I2C"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "power-management-power-audio-output",
-        "source": "power-management",
-        "target": "audio-output",
+        "id": "8-i2c-1",
+        "source": "8",
+        "target": "1",
         "type": "smoothstep",
-        "label": "Power",
+        "label": "I2C",
         "data": {
-          "interface": "Power",
-          "inferred": true
+          "interface": "I2C"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "power-management-power-wi-fi",
-        "source": "power-management",
-        "target": "wi-fi",
+        "id": "9-i2c-1",
+        "source": "9",
+        "target": "1",
         "type": "smoothstep",
-        "label": "Power",
+        "label": "I2C",
         "data": {
-          "interface": "Power",
-          "inferred": true
+          "interface": "I2C"
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "11-gpio-1",
+        "source": "11",
+        "target": "1",
+        "type": "smoothstep",
+        "label": "GPIO",
+        "data": {
+          "interface": "GPIO"
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "12-spi-1",
+        "source": "12",
+        "target": "1",
+        "type": "smoothstep",
+        "label": "SPI",
+        "data": {
+          "interface": "SPI"
         },
         "markerEnd": {
           "type": "arrowclosed"
@@ -239,29 +273,92 @@
       }
     ]
   },
-  "architecture_notes": [
-    "Wireless MCU acts as the central processing unit.",
-    "The graph represents logical subsystem relationships; exact components are intentionally deferred."
+  "subsystems": [
+    {
+      "label": "MCU",
+      "category": "Processing",
+      "reason": "Required for controlling the purification process, mobile app communication, and customizable performance settings",
+      "confidence": 0.95
+    },
+    {
+      "label": "Bluetooth Module",
+      "category": "Communication",
+      "reason": "Required for mobile app control and connectivity",
+      "confidence": 0.95
+    },
+    {
+      "label": "Power Management",
+      "category": "Power",
+      "reason": "Required for managing mains power and backup battery",
+      "confidence": 0.95
+    },
+    {
+      "label": "Battery",
+      "category": "Power",
+      "reason": "Required for backup power during mains power outages",
+      "confidence": 0.95
+    },
+    {
+      "label": "UV Controller",
+      "category": "Output",
+      "reason": "Required for controlling the UV purification process",
+      "confidence": 0.95
+    },
+    {
+      "label": "Motor Driver",
+      "category": "Output",
+      "reason": "Required for controlling the water pumps and valves",
+      "confidence": 0.95
+    },
+    {
+      "label": "Water Quality Sensor",
+      "category": "Sensor",
+      "reason": "Required for monitoring the water quality and adjusting the purification process",
+      "confidence": 0.95
+    },
+    {
+      "label": "Flow Sensor",
+      "category": "Sensor",
+      "reason": "Required for monitoring the water flow rate and adjusting the purification process",
+      "confidence": 0.95
+    },
+    {
+      "label": "Temperature Sensor",
+      "category": "Sensor",
+      "reason": "Required for monitoring the water temperature and adjusting the purification process",
+      "confidence": 0.95
+    },
+    {
+      "label": "Cloud Connectivity Module",
+      "category": "Communication",
+      "reason": "Required for cloud-based processing and remote monitoring",
+      "confidence": 0.95
+    },
+    {
+      "label": "User Interface",
+      "category": "Input",
+      "reason": "Required for user input and customizable performance settings",
+      "confidence": 0.8
+    },
+    {
+      "label": "Memory",
+      "category": "Memory",
+      "reason": "Required for storing the purification settings, water quality data, and software updates",
+      "confidence": 0.9
+    }
   ],
   "assumptions": [
-    "Wireless MCU is an inferred, technology-level subsystem from: Wi-Fi; exact components remain unspecified.",
-    "Battery is an inferred, technology-level subsystem from: ['Battery life: 24 hours']; exact components remain unspecified.",
-    "Power Management is an inferred, technology-level subsystem from: ['Battery life: 24 hours']; exact components remain unspecified.",
-    "Flash Storage is an inferred, technology-level subsystem; exact components remain unspecified."
+    "User Interface is a model-inferred subsystem (Required for user input and customizable performance settings); confidence 0.8."
   ],
   "warnings": [],
   "react_flow": {
     "nodes": [
       {
-        "id": "wireless-mcu",
+        "id": "1",
         "type": "architecture",
         "data": {
-          "label": "Wireless MCU",
-          "category": "Processing",
-          "inferred": true,
-          "sourceRequirements": [
-            "Wi-Fi"
-          ]
+          "label": "MCU",
+          "category": "Processing"
         },
         "position": {
           "x": 640,
@@ -269,15 +366,23 @@
         }
       },
       {
-        "id": "battery",
+        "id": "2",
         "type": "architecture",
         "data": {
-          "label": "Battery",
-          "category": "Power",
-          "inferred": true,
-          "sourceRequirements": [
-            "['Battery life: 24 hours']"
-          ]
+          "label": "Bluetooth Module",
+          "category": "Communication"
+        },
+        "position": {
+          "x": 960,
+          "y": 0
+        }
+      },
+      {
+        "id": "3",
+        "type": "architecture",
+        "data": {
+          "label": "Power Management",
+          "category": "Power"
         },
         "position": {
           "x": 0,
@@ -285,15 +390,11 @@
         }
       },
       {
-        "id": "power-management",
+        "id": "4",
         "type": "architecture",
         "data": {
-          "label": "Power Management",
-          "category": "Power",
-          "inferred": true,
-          "sourceRequirements": [
-            "['Battery life: 24 hours']"
-          ]
+          "label": "Battery",
+          "category": "Power"
         },
         "position": {
           "x": 0,
@@ -301,31 +402,11 @@
         }
       },
       {
-        "id": "gesture",
+        "id": "5",
         "type": "architecture",
         "data": {
-          "label": "Gesture",
-          "category": "Input",
-          "inferred": false,
-          "sourceRequirements": [
-            "Gesture"
-          ]
-        },
-        "position": {
-          "x": 320,
-          "y": 0
-        }
-      },
-      {
-        "id": "audio-output",
-        "type": "architecture",
-        "data": {
-          "label": "Audio Output",
-          "category": "Output",
-          "inferred": false,
-          "sourceRequirements": [
-            "Audio"
-          ]
+          "label": "UV Controller",
+          "category": "Output"
         },
         "position": {
           "x": 1280,
@@ -333,158 +414,229 @@
         }
       },
       {
-        "id": "wi-fi",
+        "id": "6",
         "type": "architecture",
         "data": {
-          "label": "Wi-Fi",
-          "category": "Communication",
-          "inferred": false,
-          "sourceRequirements": [
-            "Wi-Fi"
-          ]
+          "label": "Motor Driver",
+          "category": "Output"
         },
         "position": {
-          "x": 960,
+          "x": 1280,
+          "y": 160
+        }
+      },
+      {
+        "id": "7",
+        "type": "architecture",
+        "data": {
+          "label": "Water Quality Sensor",
+          "category": "Sensor"
+        },
+        "position": {
+          "x": 320,
           "y": 0
         }
       },
       {
-        "id": "flash-storage",
+        "id": "8",
         "type": "architecture",
         "data": {
-          "label": "Flash Storage",
-          "category": "Storage",
-          "inferred": true,
-          "sourceRequirements": []
+          "label": "Flow Sensor",
+          "category": "Sensor"
+        },
+        "position": {
+          "x": 320,
+          "y": 160
+        }
+      },
+      {
+        "id": "9",
+        "type": "architecture",
+        "data": {
+          "label": "Temperature Sensor",
+          "category": "Sensor"
+        },
+        "position": {
+          "x": 320,
+          "y": 320
+        }
+      },
+      {
+        "id": "10",
+        "type": "architecture",
+        "data": {
+          "label": "Cloud Connectivity Module",
+          "category": "Communication"
         },
         "position": {
           "x": 960,
+          "y": 160
+        }
+      },
+      {
+        "id": "11",
+        "type": "architecture",
+        "data": {
+          "label": "User Interface",
+          "category": "Input"
+        },
+        "position": {
+          "x": 320,
+          "y": 480
+        }
+      },
+      {
+        "id": "12",
+        "type": "architecture",
+        "data": {
+          "label": "Memory",
+          "category": "Memory"
+        },
+        "position": {
+          "x": 640,
           "y": 160
         }
       }
     ],
     "edges": [
       {
-        "id": "battery-power-power-management",
-        "source": "battery",
-        "target": "power-management",
+        "id": "1-power-3",
+        "source": "1",
+        "target": "3",
         "type": "smoothstep",
         "label": "Power",
         "data": {
-          "interface": "Power",
-          "inferred": true
+          "interface": "Power"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "power-management-power-wireless-mcu",
-        "source": "power-management",
-        "target": "wireless-mcu",
+        "id": "4-power-3",
+        "source": "4",
+        "target": "3",
         "type": "smoothstep",
         "label": "Power",
         "data": {
-          "interface": "Power",
-          "inferred": true
+          "interface": "Power"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "wireless-mcu-wifi-wi-fi",
-        "source": "wireless-mcu",
-        "target": "wi-fi",
+        "id": "2-uart-1",
+        "source": "2",
+        "target": "1",
         "type": "smoothstep",
-        "label": "WiFi",
+        "label": "UART",
         "data": {
-          "interface": "WiFi",
-          "inferred": true
+          "interface": "UART"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "wireless-mcu-spi-flash-storage",
-        "source": "wireless-mcu",
-        "target": "flash-storage",
+        "id": "10-uart-1",
+        "source": "10",
+        "target": "1",
         "type": "smoothstep",
-        "label": "SPI",
+        "label": "UART",
         "data": {
-          "interface": "SPI",
-          "inferred": true
+          "interface": "UART"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "gesture-gpio-wireless-mcu",
-        "source": "gesture",
-        "target": "wireless-mcu",
+        "id": "5-gpio-1",
+        "source": "5",
+        "target": "1",
         "type": "smoothstep",
         "label": "GPIO",
         "data": {
-          "interface": "GPIO",
-          "inferred": true
+          "interface": "GPIO"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "wireless-mcu-audio-audio-output",
-        "source": "wireless-mcu",
-        "target": "audio-output",
+        "id": "6-gpio-1",
+        "source": "6",
+        "target": "1",
         "type": "smoothstep",
-        "label": "Audio",
+        "label": "GPIO",
         "data": {
-          "interface": "Audio",
-          "inferred": true
+          "interface": "GPIO"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "power-management-power-gesture",
-        "source": "power-management",
-        "target": "gesture",
+        "id": "7-i2c-1",
+        "source": "7",
+        "target": "1",
         "type": "smoothstep",
-        "label": "Power",
+        "label": "I2C",
         "data": {
-          "interface": "Power",
-          "inferred": true
+          "interface": "I2C"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "power-management-power-audio-output",
-        "source": "power-management",
-        "target": "audio-output",
+        "id": "8-i2c-1",
+        "source": "8",
+        "target": "1",
         "type": "smoothstep",
-        "label": "Power",
+        "label": "I2C",
         "data": {
-          "interface": "Power",
-          "inferred": true
+          "interface": "I2C"
         },
         "markerEnd": {
           "type": "arrowclosed"
         }
       },
       {
-        "id": "power-management-power-wi-fi",
-        "source": "power-management",
-        "target": "wi-fi",
+        "id": "9-i2c-1",
+        "source": "9",
+        "target": "1",
         "type": "smoothstep",
-        "label": "Power",
+        "label": "I2C",
         "data": {
-          "interface": "Power",
-          "inferred": true
+          "interface": "I2C"
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "11-gpio-1",
+        "source": "11",
+        "target": "1",
+        "type": "smoothstep",
+        "label": "GPIO",
+        "data": {
+          "interface": "GPIO"
+        },
+        "markerEnd": {
+          "type": "arrowclosed"
+        }
+      },
+      {
+        "id": "12-spi-1",
+        "source": "12",
+        "target": "1",
+        "type": "smoothstep",
+        "label": "SPI",
+        "data": {
+          "interface": "SPI"
         },
         "markerEnd": {
           "type": "arrowclosed"

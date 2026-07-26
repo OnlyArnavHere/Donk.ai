@@ -1,38 +1,40 @@
 {
-  "project_name": "Smart Glasses",
-  "category": "Wearable device",
-  "objective": "Fitness tracking and gesture input",
+  "project_name": "Smart Water Purifier",
+  "objective": "UV and filter-based water purification with mobile app control",
   "target_users": [
-    "Fitness enthusiasts"
+    "residential",
+    "commercial",
+    "industrial"
   ],
   "functional_requirements": [
-    "Fitness tracking",
-    "Gesture input"
+    "UV purification",
+    "filter-based purification",
+    "mobile app control"
   ],
   "hardware_inputs": [
-    "Gesture"
+    "multiple water sources"
   ],
   "hardware_outputs": [
-    "Audio"
+    "purified water",
+    "waste water"
   ],
   "connectivity": [
-    "Wi-Fi"
+    "Bluetooth",
+    "cloud-based processing"
   ],
-  "supported_platforms": [
-    "Android",
-    "iOS",
-    "Desktop"
-  ],
-  "power_requirements": "['Battery life: 24 hours']",
+  "power_requirements": "['mains power', 'backup battery']",
   "physical_constraints": [
-    "Weight: minimal",
-    "Water resistance: IP67"
+    "size",
+    "durability"
   ],
   "performance_requirements": [
-    "Edge processing on a dedicated AI chip"
+    "customizable performance settings",
+    "real-time monitoring"
   ],
   "safety_compliance": [
-    "Eye protection",
-    "Secure data storage"
-  ]
+    "UL",
+    "CE",
+    "FDA"
+  ],
+  "budget": "$500-$1000"
 }
