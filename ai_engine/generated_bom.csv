@@ -1,7 +1,0 @@
-Subsystem Module,Category,Manufacturer,Selected MPN,Qty,Unit Price ($),Total Cost ($),Available Stock
-Wireless MCU,Processing,Texas Instruments,CC430F5137IRGZR,1,4.81,4.81,5
-Gesture,Sensors,PADAUK Tech,PMS150C-U06,1,0.04,0.04,8332
-Wi-Fi,Communication,TDK,ZCAT2132-1130,1,1.0,1.0,331
-Audio Output,Output,WILLSEMI(Will Semicon),WMM7037AT2-4/TR,1,0.33,0.33,5264
-Battery,Power,Texas Instruments,BQ25892RTWR,1,2.23,2.23,368
-Power Management,Power,Texas Instruments,LM22679TJ-ADJ/NOPB,1,5.29,5.29,56
